@@ -1,7 +1,37 @@
+"use client"
+
 import Link from "next/link";
 import Navbar from "../components/Navbar";
+import { useState } from "react";
+import { showToast } from "nextjs-toast-notify";
 
 export default function Login() {
+
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    rememberMe: false
+  });
+
+  const handleChangeFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: type === "checkbox" ? checked : value
+    }));
+  };
+
+
+  const handleFormSubmit = () => {
+    if (!formData) {
+      showToast("Missing feilds Required", "error")
+      return;
+    }
+  }
+
+
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
       <Navbar />
@@ -19,6 +49,8 @@ export default function Login() {
                 Email address
               </label>
               <input
+                value={formData.email}
+                onChange={(e) => handleChangeFormData(e)}
                 id="email"
                 type="email"
                 placeholder="doctor@medisync.com"
@@ -32,6 +64,8 @@ export default function Login() {
                 Password
               </label>
               <input
+                value={formData.password}
+                onChange={(e) => handleChangeFormData(e)}
                 id="password"
                 type="password"
                 placeholder="••••••••"
@@ -43,6 +77,8 @@ export default function Login() {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
+                  value={formData.rememberMe}
+                  onChange={(e) => handleChangeFormData(e)}
                   id="remember-me"
                   type="checkbox"
                   className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"

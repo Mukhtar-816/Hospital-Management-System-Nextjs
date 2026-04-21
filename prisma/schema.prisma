@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  userId       String   @id @default(uuid())
+  userName     String   @unique
+  userEmail    String   @unique
+  userPassword String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  doctor       Doctor?
+  receptionist Receptionist?
+}
+
+model Doctor {
+  doctorId       String @id @default(uuid())
+  userId         String @unique
+  specialization String
+  status         String @default("Available")
+
+  user         User          @relation(fields: [userId], references: [userId])
+  appointments Appointment[]
+  encounters   Encounter[]
+}
+
+model Patient {
+  patientId     String    @id @default(uuid())
+  patientNumber String    @unique
+  address       String?
+  lastVisited   DateTime?
+  gender        String?
+  age           Int?
+
+  appointments Appointment[]
+  encounters   Encounter[]
+}
+
+model Receptionist {
+  receptionistId String @id @default(uuid())
+  userId         String @unique
+
+  user User @relation(fields: [userId], references: [userId])
+}
+
+model Appointment {
+  appointmentId String   @id @default(uuid())
+  doctorId      String
+  patientId     String
+  startTime     DateTime
+  endTime       DateTime
+  status        String   @default("Scheduled")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  doctor  Doctor  @relation(fields: [doctorId], references: [doctorId])
+  patient Patient @relation(fields: [patientId], references: [patientId])
+
+  encounter Encounter?
+}
+
+model Encounter {
+  encounterId   String   @id @default(uuid())
+  symptoms      String?
+  doctorId      String
+  patientId     String
+  appointmentId String   @unique
+  createdAt     DateTime @default(now())
+
+  doctor      Doctor       @relation(fields: [doctorId], references: [doctorId])
+  patient     Patient      @relation(fields: [patientId], references: [patientId])
+  appointment Appointment? @relation(fields: [appointmentId], references: [appointmentId])
+
+  prescriptions Prescription[]
+  diagnoses     Diagnosis[]
+}
+
+model Prescription {
+  prescriptionId String   @id @default(uuid())
+  medicine       String
+  frequency      Int
+  duration       Int
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  encounterId String
+  encounter   Encounter @relation(fields: [encounterId], references: [encounterId])
+}
+
+model Diagnosis {
+  diagnosisId String  @id @default(uuid())
+  description String?
+
+  encounterId String
+  encounter   Encounter @relation(fields: [encounterId], references: [encounterId])
+}
