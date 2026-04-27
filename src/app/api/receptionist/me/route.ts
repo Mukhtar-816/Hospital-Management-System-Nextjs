@@ -18,16 +18,19 @@ export async function GET(request: NextRequest) {
 
         const result = await client.query(
             `
-      SELECT 
-        r.receptionistid,
-        r.createdat,
-        u.userid,
-        u.username,
-        u.useremail
-      FROM receptionist r
-      JOIN users u ON r.userid = u.userid
-      WHERE r.userid = $1
-      `,
+  SELECT 
+    re.receptionistid,
+    re.createdat,
+    u.userid,
+    u.username,
+    u.useremail,
+    r.name as role
+  FROM receptionist re
+  JOIN users u ON re.userid = u.userid
+  JOIN userrole ur ON ur.userid = u.userid
+  JOIN role r ON r.roleid = ur.roleid
+  WHERE u.userid = $1
+  `,
             [user.userId]
         );
 
