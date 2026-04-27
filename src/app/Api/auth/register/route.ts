@@ -4,10 +4,11 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const result = await register(body)
+    const result = await register(body);
 
     return Response.json(result);
-  } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 400 });
+  } catch (err : unknown) {
+    console.log(err)
+    return Response.json({ error: err }, { status: 400 });
   }
-};
+}

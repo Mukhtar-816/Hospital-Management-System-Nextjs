@@ -6,12 +6,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Forms";
+import { showToast } from "nextjs-toast-notify";
 
 export default function RegisterPage() {
   const router = useRouter();
 
   const [form, setForm] = React.useState({
-    username: "",
+    fullname: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -45,8 +46,7 @@ export default function RegisterPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: form.username, // Map 'Full Name' to 'name'
-          username: form.email.split('@')[0], // Simple username generation
+          fullname: form.fullname || form.email.split('@')[0],
           email: form.email,
           password: form.password,
         }),
@@ -57,6 +57,8 @@ export default function RegisterPage() {
 
       if (!res.ok) {
         setError(data.message);
+        console.log(data);
+        showToast.error(data.message || "Error Registering");
         return;
       }
 
@@ -79,7 +81,7 @@ export default function RegisterPage() {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            name="username"
+            name="fullname"
             label="Full Name"
             type="text"
             placeholder="John Doe"
