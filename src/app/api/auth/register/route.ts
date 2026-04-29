@@ -4,10 +4,10 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const result = await register(body)
+    const result = await register(body);
 
     return Response.json(result);
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 400 });
+    return Response.json({ error: err.message || "Something went wrong" }, { status: 400 });
   }
-};
+}

@@ -12,8 +12,6 @@ export async function register(data: any) {
     throw new Error("User already exists");
   }
 
-
-
   const hashed = await hashPassword(password);
 
   const user = await userService.createUser(email, hashed);
@@ -24,7 +22,6 @@ export async function register(data: any) {
 
   return { message: "Registered successfully" };
 }
-
 
 export async function login(data: any) {
   const { email, password } = data;

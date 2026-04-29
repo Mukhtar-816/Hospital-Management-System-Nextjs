@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Forms";
+import { showToast } from "nextjs-toast-notify";
 
 export default function LoginPage() {
 
@@ -43,13 +44,27 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Login failed");
-        return;
+        throw new Error(data?.error);
       }
 
-      router.push(`/${data.role}/dashboard`);
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
+      const meRes = await fetch("/api/users/me", { method: "GET" });
+      const meData = await meRes.json();
+
+      const role: string = meData.role;
+      showToast.success(role);
+
+      if (role == "admin") {
+        router.push("/admin/dashboard");
+      } else if (role == "doctor") {
+        router.push("/doctor/dashboard");
+      } else if (role == "receptionist") {
+        router.push("/receptionist/dashboard");
+      } else {
+        router.push("/patient/dashboard");
+      }
+    } catch (err: any) {
+      showToast.error(err.message || "Something went wrong");
+      setError(err.message || "Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }

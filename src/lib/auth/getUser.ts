@@ -1,11 +1,24 @@
 import { verifyToken } from "./jwt";
 
 export function getUser(req: Request) {
-  const auth = req.headers.get("authorization");
+  try {
+    const cookieHeader = req.headers.get("cookie");
 
-  if (!auth) throw new Error("Unauthorized");
+    if (!cookieHeader) throw new Error("Unauthorized");
 
-  const token = auth.split(" ")[1];
+    const cookies = Object.fromEntries(
+      cookieHeader.split("; ").map((c) => {
+        const [key, ...v] = c.split("=");
+        return [key, v.join("=")];
+      })
+    );
 
-  return verifyToken(token);
+    const token = cookies["auth_token"];
+
+    if (!token) throw new Error("Unauthorized");
+
+    return verifyToken(token);
+  } catch {
+    throw new Error("Unauthorized");
+  }
 }

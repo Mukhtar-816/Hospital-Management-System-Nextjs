@@ -27,12 +27,12 @@ export default function LandingPage() {
           <span className="font-bold text-2xl tracking-tight">MedCloud</span>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/auth/login">
+          <Link href="/login">
             <Button variant="ghost" type="button">
               Sign In
             </Button>
           </Link>
-          <Link href="/auth/register">
+          <Link href="/register">
             <Button type="button">Register</Button>
           </Link>
         </div>

@@ -9,10 +9,10 @@ export async function getUserRoleAndPermissions(userId: string): Promise<UserRol
   const client = await pool.connect();
   try {
     const roleRes = await client.query(
-      `SELECT r.name 
-       FROM Role r
-       JOIN UserRole ur ON r.roleId = ur.roleId
-       WHERE ur.userId = $1`,
+      `SELECT r.name
+       FROM role r
+       JOIN userrole ur ON r.roleid = ur.roleid
+       WHERE ur.userid = $1`,
       [userId]
     );
 
@@ -22,21 +22,17 @@ export async function getUserRoleAndPermissions(userId: string): Promise<UserRol
 
     const permRes = await client.query(
       `SELECT p.name
-       FROM Permission p
-       JOIN RolePermission rp ON p.permissionId = rp.permissionId
-       JOIN Role r ON rp.roleId = r.roleId
+       FROM permission p
+       JOIN rolepermission rp ON p.permissionid = rp.permissionid
+       JOIN role r ON rp.roleid = r.roleid
        WHERE r.name = $1`,
       [roleName]
     );
 
-    const permissions = permRes.rows.map(row => row.name);
+    const permissions = permRes.rows.map((row) => row.name);
 
-    return {
-      role: roleName,
-      permissions
-    };
-  } catch (error) {
-    console.error("Error fetching RBAC:", error);
+    return { role: roleName, permissions };
+  } catch {
     return null;
   } finally {
     client.release();

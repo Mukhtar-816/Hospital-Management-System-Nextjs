@@ -56,17 +56,16 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message);
-        console.log(data);
-        showToast.error(data.message || "Error Registering");
+        setError(data.error || "Registration failed");
+        showToast.error(data.error || "Error Registering");
         return;
       }
 
+      showToast.success(data.message || "Registered successfully");
       router.push("/login");
 
-    } catch (err) {
-      console.log(err);
-      setError("Something went wrong");
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
     } finally {
       setIsLoading(false);
     }
