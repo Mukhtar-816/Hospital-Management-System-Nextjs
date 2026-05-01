@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Forms";
 import { Modal } from "@/components/ui/Modal";
 import { Table, TableCell, TableRow } from "@/components/ui/Table";
+import { useLoading } from "@/lib/LoadingContext";
 
 type Role = { roleid: string; name: string };
 
@@ -23,17 +24,13 @@ type User = {
 };
 
 export default function AdminUsers() {
+  const { showLoading, hideLoading } = useLoading();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-
   const [users, setUsers] = useState<User[]>([]);
   const [role, setRole] = useState<Role[]>([]);
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
   const [selectedRole, setSelectedRole] = useState("");
-
   const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -47,7 +44,7 @@ export default function AdminUsers() {
   });
 
   const loadData = async () => {
-    setLoading(true);
+    showLoading();
     setError("");
 
     try {
@@ -60,22 +57,20 @@ export default function AdminUsers() {
 
       const usersData = await usersRes.json();
       const rolesData = await roleRes.json();
-      console.log("USERS API:", usersData);
 
       setUsers(usersData);
       setRole(Array.isArray(rolesData) ? rolesData : rolesData.role || []);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
       setError("Something went wrong loading data");
     } finally {
-      setLoading(false);
+      hideLoading();
     }
   };
+
   useEffect(() => {
     loadData();
-  }, [loadData]);
+  }, []);
 
-  // ================= FORM =================
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -108,8 +103,6 @@ export default function AdminUsers() {
 
   const handleOpenEdit = (user: User) => {
     resetForm();
-    console.log("API RESPONSE:", user);
-
     setFormData({
       id: user.userid,
       fullname: user.fullname || "",
@@ -125,7 +118,6 @@ export default function AdminUsers() {
     setIsModalOpen(true);
   };
 
-  // ================= SUBMIT =================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -136,6 +128,7 @@ export default function AdminUsers() {
 
     setError("");
     setSuccess("");
+    showLoading();
 
     try {
       const endpoint =
@@ -162,7 +155,6 @@ export default function AdminUsers() {
       if (!isEditing) {
         payload.password = formData.password;
       }
-      console.log("FORM STATE:", formData);
 
       const res = await fetch(endpoint, {
         method,
@@ -175,24 +167,22 @@ export default function AdminUsers() {
       }
 
       setSuccess(`User ${isEditing ? "updated" : "created"} successfully`);
-
       await loadData();
-
-      setTimeout(() => {
-        setIsModalOpen(false);
-      }, 1000);
+      setTimeout(() => setIsModalOpen(false), 1000);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
+    } finally {
+      hideLoading();
     }
   };
 
-  // ================= DELETE =================
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this user?")) return;
 
     setError("");
     setSuccess("");
-    console.log("id", id);
+    showLoading();
+
     try {
       const res = await fetch(`/api/admin/users/${id}`, {
         method: "DELETE",
@@ -201,14 +191,14 @@ export default function AdminUsers() {
       if (!res.ok) throw new Error("Delete failed");
 
       setSuccess("User deleted successfully");
-
       await loadData();
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      hideLoading();
     }
   };
 
-  // ================= UI =================
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -226,41 +216,33 @@ export default function AdminUsers() {
       {success && <p className="text-green-500">{success}</p>}
 
       <Card>
-        {loading ? (
-          <p className="p-4 text-white">Loading...</p>
-        ) : (
-          <Table headers={["Name", "Email", "Role", "Actions"]}>
-            {users.map((user) => (
-              <TableRow key={user.userid}>
-                <TableCell>{user.fullname || "-"}</TableCell>
-                <TableCell>{user.useremail}</TableCell>
-
-                <TableCell>
-                  <Badge>{user.role}</Badge>
-                </TableCell>
-
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => handleOpenEdit(user)}>
-                      Edit
-                    </Button>
-
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDelete(user.userid)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </Table>
-        )}
+        <Table headers={["Name", "Email", "Role", "Actions"]}>
+          {users.map((user) => (
+            <TableRow key={user.userid}>
+              <TableCell>{user.fullname || "-"}</TableCell>
+              <TableCell>{user.useremail}</TableCell>
+              <TableCell>
+                <Badge>{user.role}</Badge>
+              </TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => handleOpenEdit(user)}>
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDelete(user.userid)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </Table>
       </Card>
 
-      {/* ================= MODAL ================= */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -346,7 +328,6 @@ export default function AdminUsers() {
             <Button type="button" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
-
             <Button type="submit">{isEditing ? "Update" : "Create"}</Button>
           </div>
         </form>

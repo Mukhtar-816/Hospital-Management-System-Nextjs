@@ -3,6 +3,7 @@ import { getPatientByUserId, updatePatient } from "@/lib/services/patient/patien
 import { getUser } from "src/lib/auth/getUser";
 import { getUserRoleAndPermissions, requirePermission } from "src/lib/auth/permission";
 import { findById } from "src/lib/services/user/user.service";
+import { getReceptionistByUserId, updateReceptionist } from "src/lib/services/receptionist/receptionist.service";
 
 export async function GET(req: NextRequest) {
     try {
@@ -10,12 +11,12 @@ export async function GET(req: NextRequest) {
         if (!decoded) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
         const access = await getUserRoleAndPermissions(decoded.userid);
-        requirePermission("patient.read", access);
+        requirePermission("receptionist.read", access);
 
         const user = await findById(decoded.userid);
-        const patient = await getPatientByUserId(decoded.userid);
-        if (!patient || !user) return NextResponse.json({ error: "Patient not found" }, { status: 404 });
-        return NextResponse.json({ ...patient, ...user });
+        const receptionist = await getReceptionistByUserId(decoded.userid);
+        if (!receptionist || !user) return NextResponse.json({ error: "Receptionist not found" }, { status: 404 });
+        return NextResponse.json({ ...receptionist, ...user, role: "receptionist" });
 
     } catch (error: any) {
         console.log(error);
@@ -30,17 +31,17 @@ export async function PUT(req: NextRequest) {
         if (!decoded) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
         const access = await getUserRoleAndPermissions(decoded.userid);
-        requirePermission("patient.update", access);
+        requirePermission("receptionist.update", access);
 
         const user = await findById(decoded.userid);
-        const patient = await getPatientByUserId(decoded.userid);
-        if (!patient || !user) return NextResponse.json({ error: "Patient not found" }, { status: 404 });
+        const receptionist = await getReceptionistByUserId(decoded.userid);
+        if (!receptionist || !user) return NextResponse.json({ error: "Receptionist not found" }, { status: 404 });
 
         const data = await req.json();
-        const updatedPatient = await updatePatient(decoded.userid, data);
-        if (!updatedPatient) return NextResponse.json({ error: "Patient not updated" }, { status: 500 });
+        const updatedReceptionist = await updateReceptionist(decoded.userid, data);
+        if (!updatedReceptionist) return NextResponse.json({ error: "Receptionist not updated" }, { status: 500 });
 
-        return NextResponse.json({ ...updatedPatient, ...user });
+        return NextResponse.json({ ...updatedReceptionist, ...user });
 
     } catch (error: any) {
         console.log(error);

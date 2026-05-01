@@ -4,7 +4,9 @@ import {
   getUserRoleAndPermissions,
   requirePermission,
 } from "@/lib/auth/permission";
-import { pool } from "@/lib/db";
+import * as userService from "@/lib/services/user/user.service";
+import * as receptionistService from "@/lib/services/receptionist/receptionist.service";
+import { hashPassword } from "@/lib/auth/hash";
 
 export async function POST(req: Request) {
   try {
@@ -16,39 +18,19 @@ export async function POST(req: Request) {
     requirePermission("admin.read", access);
 
     const body = await req.json();
-    console.log("BODY:", body);
-    const useremail = body.useremail ?? body.email;
+    const email = body.useremail ?? body.email;
     const { password, fullname } = body;
 
-    const userResult = await pool.query(
-      "INSERT INTO users (useremail, userpassword) VALUES ($1, $2) RETURNING userid",
-      [useremail, password],
-    );
-    const userid = userResult.rows[0].userid;
-    console.log("USERID:", userid);
+    const hashed = await hashPassword(password);
+    const user = await userService.createUser(email, hashed);
+    
+    await receptionistService.createReceptionist(user.userid, fullname);
+    await userService.assignRole(user.userid, "receptionist");
 
-    await pool.query(
-      "INSERT INTO receptionist (userid, fullname) VALUES ($1, $2)",
-      [userid, fullname],
-    );
-
-    const roleRes = await pool.query(
-      "SELECT roleid FROM role WHERE name = 'receptionist'",
-    );
-    if (roleRes.rows.length === 0) {
-      throw new Error("Role not found");
-    }
-
-    await pool.query("INSERT INTO userrole (userid, roleid) VALUES ($1, $2)", [
-      userid,
-      roleRes.rows[0].roleid,
-    ]);
-    console.log("ROLE ASSIGNED");
-
-    return Response.json({ success: true });
+    return Response.json({ success: true, userid: user.userid });
   } catch (err: any) {
-    console.error("CREATE ROLE ERROR:", err);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    console.error("CREATE RECEPTIONIST ERROR:", err);
+    return NextResponse.json({ error: err.message || "Failed" }, { status: 500 });
   }
 }
 
@@ -64,29 +46,16 @@ export async function PUT(req: Request) {
     const body = await req.json();
     const { userid, useremail, fullname } = body;
 
-    const userResult = await pool.query(
-      "UPDATE users SET useremail = $1 WHERE userid = $2 RETURNING userid",
-      [useremail, userid],
-    );
-
-    if (userResult.rows.length === 0) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const user = await userService.findById(userid);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    await pool.query(
-      "UPDATE receptionist SET fullname = $1 WHERE userid = $2",
-      [fullname, userid],
-    );
+    await receptionistService.updateReceptionist(userid, fullname);
 
     return Response.json({ success: true });
   } catch (err: any) {
-    if (err?.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    if (err?.message === "Forbidden") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-    console.error("CREATE ROLE ERROR:", err);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    console.error("UPDATE RECEPTIONIST ERROR:", err);
+    return NextResponse.json({ error: err.message || "Failed" }, { status: 500 });
   }
 }

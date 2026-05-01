@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/Button";
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-bg text-text">
-      {/* Navigation */}
       <nav className="container mx-auto px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
@@ -28,9 +27,7 @@ export default function LandingPage() {
         </div>
         <div className="flex items-center gap-4">
           <Link href="/login">
-            <Button variant="ghost" type="button">
-              Sign In
-            </Button>
+            <Button variant="ghost" type="button">Sign In</Button>
           </Link>
           <Link href="/register">
             <Button type="button">Register</Button>
@@ -38,45 +35,32 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <main className="container mx-auto px-6 pt-20 pb-32">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="inline-block px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-primary text-sm font-semibold tracking-wide uppercase">
             Modern Healthcare Management
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight">
-            The future of <span className="text-primary">hospital care</span> is
-            here.
+            The future of <span className="text-primary">hospital care</span> is here.
           </h1>
           <p className="text-xl text-textMuted max-w-2xl mx-auto leading-relaxed">
-            MedCloud provides a seamless experience for patients, doctors, and
-            administrators. Streamline appointments, manage records, and improve
-            patient outcomes.
+            MedCloud provides a seamless experience for patients, doctors, and administrators. 
+            Streamline appointments, manage records, and improve patient outcomes.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link href="/auth/register" className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto text-lg px-8"
-                type="button"
-              >
+              <Button size="lg" className="w-full sm:w-auto text-lg px-8" type="button">
                 Get Started as a Patient
               </Button>
             </Link>
             <Link href="/auth/login" className="w-full sm:w-auto">
-              <Button
-                variant="secondary"
-                size="lg"
-                className="w-full sm:w-auto text-lg px-8"
-                type="button"
-              >
+              <Button variant="secondary" size="lg" className="w-full sm:w-auto text-lg px-8" type="button">
                 Portal Login
               </Button>
             </Link>
           </div>
         </div>
 
-        {/* Feature Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-32">
           <FeatureCard
             icon="🏥"
@@ -96,7 +80,6 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-border py-12">
         <div className="container mx-auto px-6 text-center text-textMuted text-sm">
           <p>© 2026 MedCloud HMS. All rights reserved.</p>

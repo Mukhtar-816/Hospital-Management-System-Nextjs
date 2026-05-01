@@ -27,9 +27,11 @@ export async function login(data: any) {
   const { email, password } = data;
 
   const user = await userService.findByEmail(email);
+
   if (!user) throw new Error("User not found");
 
   const valid = await comparePassword(password, user.userpassword);
+
   if (!valid) throw new Error("Invalid credentials");
 
   const roles = await userService.getUserRoles(user.userid);

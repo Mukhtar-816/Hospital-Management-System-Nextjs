@@ -4,6 +4,7 @@ import {
   requirePermission,
 } from "@/lib/auth/permission";
 import * as userService from "@/lib/services/user/user.service";
+import { hashPassword } from "@/lib/auth/hash";
 
 export async function GET(req: Request) {
   try {
@@ -18,12 +19,38 @@ export async function GET(req: Request) {
 
     return Response.json(users);
   } catch (err: any) {
+    console.log(err)
     if (err?.message === "Unauthorized") {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
     if (err?.message === "Forbidden") {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
+    return Response.json(
+      { error: err?.message || "Something went wrong" },
+      { status: 400 },
+    );
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const decoded = getUser(req) as { userid: string };
+    const access = await getUserRoleAndPermissions(decoded.userid);
+    if (!access) {
+      throw new Error("Forbidden");
+    }
+    requirePermission("admin.read", access);
+
+    const body = await req.json();
+    const { email, password } = body;
+
+    const hashed = await hashPassword(password);
+    const user = await userService.createUser(email, hashed);
+
+    return Response.json({ success: true, user });
+  } catch (err: any) {
+    console.error("ADMIN CREATE USER ERROR:", err);
     return Response.json(
       { error: err?.message || "Something went wrong" },
       { status: 400 },

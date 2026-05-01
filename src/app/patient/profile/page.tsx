@@ -4,39 +4,37 @@ import { showToast } from "nextjs-toast-notify";
 import { useEffect, useState } from "react";
 import { ProfileTemplate } from "@/components/modules/ProfileTemplate";
 import { Input, Select } from "@/components/ui/Forms";
+import { useLoading } from "@/lib/LoadingContext";
 
 export default function PatientProfile() {
-  const [loading, setLoading] = useState(false);
+  const { showLoading, hideLoading } = useLoading();
   const [userData, setUserData] = useState<any>(null);
   const [formData, setFormData] = useState<any>(null);
 
   async function getUserProfile() {
-    setLoading(true);
+    showLoading();
     try {
       const res = await fetch("/api/patient/me");
-
       if (!res.ok) {
         showToast.error("Error Getting Profile");
         return;
       }
-
       const data = await res.json();
       setUserData(data);
       setFormData(data);
     } catch {
       showToast.error("Something went wrong");
     } finally {
-      setLoading(false);
+      hideLoading();
     }
   }
 
   async function handleUpdate() {
+    showLoading();
     try {
-      const res = await fetch("/api/patient", {
+      const res = await fetch("/api/patient/me", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           patientid: userData.patientid,
           userid: userData.userid,
@@ -55,38 +53,34 @@ export default function PatientProfile() {
 
       showToast.success("Profile updated");
       getUserProfile();
-    } catch {
-      showToast.error("Something went wrong");
+    } catch (err: any) {
+      showToast.error(err.message);
+    } finally {
+      hideLoading();
     }
   }
 
   useEffect(() => {
     getUserProfile();
-  }, [getUserProfile]);
+  }, []);
 
-  if (loading || !formData) {
-    return <div className="p-4">Loading...</div>;
-  }
+  if (!formData) return null;
 
   const details = (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <Input
-        type=""
         label="Patient Number"
         value={formData.patientnumber || ""}
         onChange={(e) =>
           setFormData({ ...formData, patientnumber: e.target.value })
         }
       />
-
       <Input label="Email" value={formData.useremail || ""} readOnly />
-
       <Input
         label="Full Name"
         value={formData.fullname || ""}
         onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
       />
-
       <div className="md:col-span-2">
         <Input
           label="Address"
@@ -96,7 +90,6 @@ export default function PatientProfile() {
           }
         />
       </div>
-
       <Select
         label="Gender"
         value={formData.gender || ""}
@@ -109,8 +102,6 @@ export default function PatientProfile() {
           { value: "other", label: "Other" },
         ]}
       />
-
-      {/* SAVE BUTTON */}
       <div className="md:col-span-2">
         <button
           onClick={handleUpdate}

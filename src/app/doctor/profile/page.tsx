@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 import { ProfileTemplate } from "@/components/modules/ProfileTemplate";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Forms";
+import { useLoading } from "@/lib/LoadingContext";
 
 export default function DoctorProfile() {
-  const [loading, setLoading] = useState(true);
+  const { showLoading, hideLoading } = useLoading();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -23,17 +24,13 @@ export default function DoctorProfile() {
     status: "active",
   });
 
-  // 🔥 LOAD DATA
   useEffect(() => {
     const loadProfile = async () => {
+      showLoading();
       try {
         const res = await fetch("/api/doctor/me");
-
         if (!res.ok) throw new Error("Failed to load profile");
-
         const data = await res.json();
-
-        console.log(data);
 
         setUser({
           userid: data.userid,
@@ -49,24 +46,23 @@ export default function DoctorProfile() {
       } catch (err: any) {
         setError(err.message);
       } finally {
-        setLoading(false);
+        hideLoading();
       }
     };
 
     loadProfile();
   }, []);
 
-  // 🔥 HANDLE CHANGE
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🔥 UPDATE PROFILE
   const handleUpdate = async () => {
     setError("");
     setSuccess("");
+    showLoading();
 
     try {
       const res = await fetch("/api/doctor", {
@@ -81,10 +77,11 @@ export default function DoctorProfile() {
       });
 
       if (!res.ok) throw new Error("Update failed");
-
       setSuccess("Profile updated successfully");
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      hideLoading();
     }
   };
 
@@ -112,9 +109,7 @@ export default function DoctorProfile() {
     </div>
   );
 
-  if (loading) {
-    return <p className="p-4 text-textMuted">Loading profile...</p>;
-  }
+  if (!user.userid) return null;
 
   return <ProfileTemplate user={user} details={details} editable={false} />;
 }

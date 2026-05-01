@@ -18,10 +18,9 @@ export default function AdminProfile() {
         if (!res.ok) throw new Error();
 
         const data = await res.json();
-        console.log(data);
 
         setUser(data);
-      } catch {
+      } catch  (err:any){
         console.error("Failed to load profile");
       }
     };
