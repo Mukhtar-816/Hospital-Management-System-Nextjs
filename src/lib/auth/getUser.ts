@@ -10,10 +10,10 @@ export function getUser(req: Request) {
       cookieHeader.split("; ").map((c) => {
         const [key, ...v] = c.split("=");
         return [key, v.join("=")];
-      })
+      }),
     );
 
-    const token = cookies["auth_token"];
+    const token = cookies.token;
 
     if (!token) throw new Error("Unauthorized");
 

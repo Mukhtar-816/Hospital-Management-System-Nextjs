@@ -1,11 +1,11 @@
 import { pool } from "@/lib/db";
 
-export async function createPatient(userId: string, fullname: string) {
+export async function createPatient(userid: string, fullname: string) {
   const result = await pool.query(
-    `INSERT INTO patient (userid, name)
+    `INSERT INTO patient (userid, fullname)
      VALUES ($1, $2)
      RETURNING *`,
-    [userId, fullname]
+    [userid, fullname],
   );
 
   return result.rows[0];

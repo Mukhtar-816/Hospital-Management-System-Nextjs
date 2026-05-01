@@ -8,6 +8,9 @@ export async function POST(req: Request) {
 
     return Response.json(result);
   } catch (err: any) {
-    return Response.json({ error: err.message || "Something went wrong" }, { status: 400 });
+    return Response.json(
+      { error: err.message || "Something went wrong" },
+      { status: 400 },
+    );
   }
 }

@@ -5,7 +5,9 @@ export interface UserRoleAndPermissions {
   permissions: string[];
 }
 
-export async function getUserRoleAndPermissions(userId: string): Promise<UserRoleAndPermissions | null> {
+export async function getUserRoleAndPermissions(
+  userid: string,
+): Promise<UserRoleAndPermissions | null> {
   const client = await pool.connect();
   try {
     const roleRes = await client.query(
@@ -13,7 +15,7 @@ export async function getUserRoleAndPermissions(userId: string): Promise<UserRol
        FROM role r
        JOIN userrole ur ON r.roleid = ur.roleid
        WHERE ur.userid = $1`,
-      [userId]
+      [userid],
     );
 
     if (roleRes.rows.length === 0) return null;
@@ -26,7 +28,7 @@ export async function getUserRoleAndPermissions(userId: string): Promise<UserRol
        JOIN rolepermission rp ON p.permissionid = rp.permissionid
        JOIN role r ON rp.roleid = r.roleid
        WHERE r.name = $1`,
-      [roleName]
+      [roleName],
     );
 
     const permissions = permRes.rows.map((row) => row.name);

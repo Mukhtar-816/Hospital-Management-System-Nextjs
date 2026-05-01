@@ -1,18 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
-    const response = NextResponse.json({
-        success: true,
-        message: "Logged out successfully",
-    })
+export async function POST(_request: NextRequest) {
+  const response = NextResponse.json({
+    success: true,
+    message: "Logged out successfully",
+  });
 
-    response.cookies.set("auth_token", "", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-        path: "/",
-        maxAge: 0,
-    })
+  response.cookies.set("token", "", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    path: "/",
+    maxAge: 0,
+  });
 
-    return response
+  return response;
 }

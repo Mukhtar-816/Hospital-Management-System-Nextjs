@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import type React from "react";
 import { LogoutButton } from "../ui/LogoutButton";
 
-
 export type UserRole = "patient" | "receptionist" | "doctor" | "admin";
 
 interface NavItem {
@@ -406,5 +405,3 @@ export const Sidebar = ({ userRole }: { userRole: UserRole }) => {
     </aside>
   );
 };
-
-

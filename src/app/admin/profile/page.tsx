@@ -11,9 +11,9 @@ export default function AdminProfile() {
       try {
         const res = await fetch("/api/admin/me", {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          method: "GET"
+          method: "GET",
         });
         if (!res.ok) throw new Error();
 

@@ -25,7 +25,9 @@ interface TableProps {
 
 export const Table = ({ children, headers, className = "" }: TableProps) => {
   return (
-    <div className={`w-full overflow-x-auto rounded-xl border border-border ${className}`}>
+    <div
+      className={`w-full overflow-x-auto rounded-xl border border-border ${className}`}
+    >
       <table className="w-full text-left border-collapse">
         {headers && <TableHeader headers={headers} />}
         <tbody>{children}</tbody>
@@ -41,7 +43,7 @@ export const TableRow = ({
   children: React.ReactNode;
   className?: string;
 }) => (
-  <tr role="row" className={`hover:bg-border/5 transition-colors ${className}`}>
+  <tr className={`hover:bg-border/5 transition-colors ${className}`}>
     {children}
   </tr>
 );

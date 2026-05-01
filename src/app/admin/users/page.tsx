@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -11,317 +12,345 @@ import { Table, TableCell, TableRow } from "@/components/ui/Table";
 type Role = { roleid: string; name: string };
 
 type User = {
-    userid: string;
-    fullname: string;
-    email: string;
-    role: string;
-    specialization?: string;
-    address?: string;
-    gender?: string;
-    status?: string;
+  userid: string;
+  useremail: string;
+  fullname?: string;
+  specialization?: string;
+  address?: string;
+  gender?: string;
+  role: string;
+  status?: string;
 };
 
 export default function AdminUsers() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    const [users, setUsers] = useState<User[]>([]);
-    const [roles, setRoles] = useState<Role[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [role, setRole] = useState<Role[]>([]);
 
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-    const [selectedRole, setSelectedRole] = useState("");
+  const [selectedRole, setSelectedRole] = useState("");
 
-    const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
-    const [formData, setFormData] = useState({
-        id: "",
-        fullname: "",
-        email: "",
-        password: "",
-        specialization: "",
-        address: "",
-        gender: "",
+  const [formData, setFormData] = useState({
+    id: "",
+    fullname: "",
+    email: "",
+    password: "",
+    specialization: "",
+    address: "",
+    gender: "",
+  });
+
+  const loadData = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const usersRes = await fetch("/api/admin/users");
+      const roleRes = await fetch("/api/roles");
+
+      if (!usersRes.ok || !roleRes.ok) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const usersData = await usersRes.json();
+      const rolesData = await roleRes.json();
+      console.log("USERS API:", usersData);
+
+      setUsers(usersData);
+      setRole(Array.isArray(rolesData) ? rolesData : rolesData.role || []);
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong loading data");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // ================= FORM =================
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const resetForm = () => {
+    setFormData({
+      id: "",
+      fullname: "",
+      email: "",
+      password: "",
+      specialization: "",
+      address: "",
+      gender: "",
+    });
+    setSelectedRole("");
+    setIsEditing(false);
+    setError("");
+    setSuccess("");
+  };
+
+  const handleOpenCreate = () => {
+    resetForm();
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (user: User) => {
+    resetForm();
+    console.log("API RESPONSE:", user);
+
+    setFormData({
+      id: user.userid,
+      fullname: user.fullname || "",
+      email: user.useremail,
+      password: "",
+      specialization: user.specialization || "",
+      address: user.address || "",
+      gender: user.gender || "",
     });
 
-    const loadData = async () => {
-        setLoading(true);
-        setError("");
+    setSelectedRole(user.role);
+    setIsEditing(true);
+    setIsModalOpen(true);
+  };
 
-        try {
+  // ================= SUBMIT =================
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-            const usersRes = await fetch("/api/admin/users");
-            const rolesRes = await fetch("/api/roles");
+    if (!selectedRole) {
+      setError("Please select a role");
+      return;
+    }
 
+    setError("");
+    setSuccess("");
 
-            if (!usersRes.ok || !rolesRes.ok) {
-                throw new Error("Failed to fetch data");
-            }
+    try {
+      const endpoint =
+        selectedRole === "admin"
+          ? "/api/admin"
+          : `/api/${selectedRole.toLowerCase()}`;
 
-            const usersData = await usersRes.json();
-            const rolesData = await rolesRes.json();
+      const method = isEditing ? "PUT" : "POST";
+      const payload: Record<string, string> = {
+        userid: formData.id,
+        useremail: formData.email,
+        fullname: formData.fullname,
+      };
 
+      if (selectedRole === "doctor") {
+        payload.specialization = formData.specialization;
+      }
 
-            setUsers(usersData);
-            setRoles(Array.isArray(rolesData) ? rolesData : rolesData.data || []);
+      if (selectedRole === "patient") {
+        payload.address = formData.address;
+        payload.gender = formData.gender;
+      }
 
-        } catch (err) {
-            console.error(err);
-            setError("Something went wrong loading data");
-        } finally {
-            setLoading(false);
-        }
-    };
-    useEffect(() => {
-        loadData();
-    }, []);
+      if (!isEditing) {
+        payload.password = formData.password;
+      }
+      console.log("FORM STATE:", formData);
 
-    // ================= FORM =================
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
-    };
+      const res = await fetch(endpoint, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    const resetForm = () => {
-        setFormData({
-            id: "",
-            fullname: "",
-            email: "",
-            password: "",
-            specialization: "",
-            address: "",
-            gender: "",
-        });
-        setSelectedRole("");
-        setIsEditing(false);
-        setError("");
-        setSuccess("");
-    };
+      if (!res.ok) {
+        throw new Error(`Failed to ${isEditing ? "update" : "create"} user`);
+      }
 
-    const handleOpenCreate = () => {
-        resetForm();
-        setIsModalOpen(true);
-    };
+      setSuccess(`User ${isEditing ? "updated" : "created"} successfully`);
 
-    const handleOpenEdit = (user: User) => {
-        resetForm();
+      await loadData();
 
-        setFormData({
-            id: user.userid,
-            fullname: user.fullname,
-            email: user.email,
-            password: "",
-            specialization: user.specialization || "",
-            address: user.address || "",
-            gender: user.gender || "",
-        });
+      setTimeout(() => {
+        setIsModalOpen(false);
+      }, 1000);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    }
+  };
 
-        setSelectedRole(user.role);
-        setIsEditing(true);
-        setIsModalOpen(true);
-    };
+  // ================= DELETE =================
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this user?")) return;
 
-    // ================= SUBMIT =================
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    setError("");
+    setSuccess("");
+    console.log("id", id);
+    try {
+      const res = await fetch(`/api/admin/users/${id}`, {
+        method: "DELETE",
+      });
 
-        if (!selectedRole) {
-            setError("Please select a role");
-            return;
-        }
+      if (!res.ok) throw new Error("Delete failed");
 
-        setError("");
-        setSuccess("");
+      setSuccess("User deleted successfully");
 
-        try {
-            const endpoint =
-                selectedRole === "admin"
-                    ? "/api/admin"
-                    : `/api/${selectedRole.toLowerCase()}`;
+      await loadData();
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
-            const method = isEditing ? "PUT" : "POST";
-
-            const res = await fetch(endpoint, {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-            });
-
-            if (!res.ok) {
-                throw new Error(`Failed to ${isEditing ? "update" : "create"} user`);
-            }
-
-            setSuccess(`User ${isEditing ? "updated" : "created"} successfully`);
-
-            await loadData();
-
-            setTimeout(() => {
-                setIsModalOpen(false);
-            }, 1000);
-
-        } catch (err: any) {
-            setError(err.message || "Something went wrong");
-        }
-    };
-
-    // ================= DELETE =================
-    const handleDelete = async (id: string) => {
-        if (!confirm("Delete this user?")) return;
-
-        setError("");
-        setSuccess("");
-        console.log("id", id);
-        try {
-            const res = await fetch(`/api/admin/users/${id}`, {
-                method: "DELETE",
-            });
-
-            if (!res.ok) throw new Error("Delete failed");
-
-            setSuccess("User deleted successfully");
-
-            await loadData();
-
-        } catch (err: any) {
-            setError(err.message);
-        }
-    };
-
-    // ================= UI =================
-    return (
-        <div className="space-y-6">
-
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-white">User Management</h1>
-                    <p className="text-gray-500">
-                        Create users and assign roles dynamically
-                    </p>
-                </div>
-
-                <Button onClick={handleOpenCreate}>
-                    Create User
-                </Button>
-            </div>
-
-            {error && <p className="text-red-500">{error}</p>}
-            {success && <p className="text-green-500">{success}</p>}
-
-            <Card>
-                {loading ? (
-                    <p className="p-4 text-white">Loading...</p>
-                ) : (
-                    <Table headers={["Name", "Email", "Role", "Actions"]}>
-                        {users.map((user) => (
-                            <TableRow key={user.userid}>
-                                <TableCell>{user.fullname}</TableCell>
-                                <TableCell>{user.email}</TableCell>
-
-                                <TableCell>
-                                    <Badge>{user.role}</Badge>
-                                </TableCell>
-
-                                <TableCell>
-                                    <div className="flex gap-2">
-                                        <Button size="sm" onClick={() => handleOpenEdit(user)}>
-                                            Edit
-                                        </Button>
-
-                                        <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => handleDelete(user.userid)}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </Table>
-                )}
-            </Card>
-
-            {/* ================= MODAL ================= */}
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title={isEditing ? "Edit User" : "Create User"}
-            >
-                <form onSubmit={handleSubmit} className="space-y-4">
-
-                    <select
-                        value={selectedRole}
-                        onChange={(e) => setSelectedRole(e.target.value)}
-                        disabled={isEditing}
-                        className="w-full bg-black border p-2 text-white border-white"
-                    >
-                        <option value="" className="bg-black/30">Select role</option>
-                        {roles?.map((r) => (
-                            <option key={r.roleid} value={r.name} className="bg-black/30">
-                                {r.name}
-                            </option>
-                        ))}
-                    </select>
-
-                    {selectedRole && (
-                        <>
-                            <Input name="fullname" placeholder="Name" value={formData.fullname} onChange={handleChange} required />
-                            <Input name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-
-                            {!isEditing && (
-                                <Input
-                                    name="password" placeholder="Password"
-                                    type="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            )}
-
-                            {selectedRole === "doctor" && (
-                                <Input
-                                    name="specialization" placeholder="Specialization"
-                                    value={formData.specialization}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            )}
-
-                            {selectedRole === "patient" && (
-                                <>
-                                    <Input
-                                        name="address" placeholder="Address"
-                                        value={formData.address}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                    <Input
-                                        name="gender" placeholder="Gender"
-                                        value={formData.gender}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </>
-                            )}
-                        </>
-                    )}
-
-                    <div className="flex justify-end gap-2">
-                        <Button type="button" onClick={() => setIsModalOpen(false)}>
-                            Cancel
-                        </Button>
-
-                        <Button type="submit">
-                            {isEditing ? "Update" : "Create"}
-                        </Button>
-                    </div>
-
-                </form>
-            </Modal>
+  // ================= UI =================
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">User Management</h1>
+          <p className="text-gray-500">
+            Create users and assign role dynamically
+          </p>
         </div>
-    );
+
+        <Button onClick={handleOpenCreate}>Create User</Button>
+      </div>
+
+      {error && <p className="text-red-500">{error}</p>}
+      {success && <p className="text-green-500">{success}</p>}
+
+      <Card>
+        {loading ? (
+          <p className="p-4 text-white">Loading...</p>
+        ) : (
+          <Table headers={["Name", "Email", "Role", "Actions"]}>
+            {users.map((user) => (
+              <TableRow key={user.userid}>
+                <TableCell>{user.fullname || "-"}</TableCell>
+                <TableCell>{user.useremail}</TableCell>
+
+                <TableCell>
+                  <Badge>{user.role}</Badge>
+                </TableCell>
+
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={() => handleOpenEdit(user)}>
+                      Edit
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(user.userid)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </Table>
+        )}
+      </Card>
+
+      {/* ================= MODAL ================= */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={isEditing ? "Edit User" : "Create User"}
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <select
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value)}
+            disabled={isEditing}
+            className="w-full bg-black border p-2 text-white border-white"
+          >
+            <option value="" className="bg-black/30">
+              Select role
+            </option>
+            {role?.map((r) => (
+              <option key={r.roleid} value={r.name} className="bg-black/30">
+                {r.name}
+              </option>
+            ))}
+          </select>
+
+          {selectedRole && (
+            <>
+              <Input
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+              <Input
+                name="fullname"
+                placeholder="Name"
+                value={formData.fullname}
+                onChange={handleChange}
+                required
+              />
+
+              {!isEditing && (
+                <Input
+                  name="password"
+                  placeholder="Password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              )}
+
+              {selectedRole === "doctor" && (
+                <Input
+                  name="specialization"
+                  placeholder="Specialization"
+                  value={formData.specialization}
+                  onChange={handleChange}
+                  required
+                />
+              )}
+
+              {selectedRole === "patient" && (
+                <>
+                  <Input
+                    name="address"
+                    placeholder="Address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Input
+                    name="gender"
+                    placeholder="Gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    required
+                  />
+                </>
+              )}
+            </>
+          )}
+
+          <div className="flex justify-end gap-2">
+            <Button type="button" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+
+            <Button type="submit">{isEditing ? "Update" : "Create"}</Button>
+          </div>
+        </form>
+      </Modal>
+    </div>
+  );
 }

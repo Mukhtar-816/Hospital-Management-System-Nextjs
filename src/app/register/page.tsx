@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
 import { useRouter } from "next/navigation";
+import { showToast } from "nextjs-toast-notify";
+import React from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Forms";
-import { showToast } from "nextjs-toast-notify";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -46,12 +46,11 @@ export default function RegisterPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          fullname: form.fullname || form.email.split('@')[0],
+          fullname: form.fullname || form.email.split("@")[0],
           email: form.email,
           password: form.password,
         }),
       });
-
 
       const data = await res.json();
 
@@ -63,7 +62,6 @@ export default function RegisterPage() {
 
       showToast.success(data.message || "Registered successfully");
       router.push("/login");
-
     } catch (err: any) {
       setError(err.message || "Something went wrong");
     } finally {
@@ -115,9 +113,7 @@ export default function RegisterPage() {
             onChange={handleChange}
           />
 
-          {error && (
-            <p className="text-red-500 text-sm">{error}</p>
-          )}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <div className="flex items-start gap-2 text-sm text-textMuted pt-1">
             <input

@@ -1,7 +1,7 @@
-import { hashPassword, comparePassword } from "@/lib/auth/hash";
+import { comparePassword, hashPassword } from "@/lib/auth/hash";
 import { signToken } from "@/lib/auth/jwt";
-import * as userService from "../user/user.service";
 import * as patientService from "../patient/patient.service";
+import * as userService from "../user/user.service";
 
 export async function register(data: any) {
   const { email, password, fullname } = data;
@@ -32,7 +32,10 @@ export async function login(data: any) {
   const valid = await comparePassword(password, user.userpassword);
   if (!valid) throw new Error("Invalid credentials");
 
-  const token = signToken({ userId: user.userid });
+  const roles = await userService.getUserRoles(user.userid);
+  const role = roles[0] || "patient";
 
-  return { token };
+  const token = signToken({ userid: user.userid, role });
+
+  return { token, role };
 }

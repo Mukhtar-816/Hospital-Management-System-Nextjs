@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Forms";
 import { Modal } from "@/components/ui/Modal";
-import { Table, TableCell, TableHeader, TableRow } from "@/components/ui/Table";
+import { Table, TableCell, TableRow } from "@/components/ui/Table";
 
 type BadgeVariant =
   | "default"
@@ -88,11 +88,7 @@ export default function ReceptionistAppointments() {
               <Badge variant={app.status}>{app.status}</Badge>
             </TableCell>
             <TableCell>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleEdit(app)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => handleEdit(app)}>
                 Edit
               </Button>
             </TableCell>

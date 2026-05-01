@@ -5,14 +5,21 @@ export async function GET(req: Request) {
   try {
     const decoded = getUser(req) as { userid: string };
 
-    const user = await userService.getMe(decoded.userid);
+    const me = await userService.getMe(decoded.userid);
 
-    if (!user) {
+    if (!me) {
       return Response.json({ error: "User not found" }, { status: 404 });
     }
 
-    return Response.json(user);
+    return Response.json({
+      userid: me.userid,
+      useremail: me.useremail,
+      role: me.role,
+    });
   } catch (err: any) {
-    return Response.json({ error: err.message || "Something went wrong" }, { status: 400 });
+    return Response.json(
+      { error: err.message || "Something went wrong" },
+      { status: 400 },
+    );
   }
 }

@@ -1,12 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
-import { Sidebar, type UserRole } from "./Sidebar";
 import { LogoutButton } from "../ui/LogoutButton";
-
+import { Sidebar, type UserRole } from "./Sidebar";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -98,7 +96,6 @@ export const DashboardLayout = ({
             <LogoutButton className="border border-border" />
           </div>
         </div>
-
       </div>
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -182,7 +179,7 @@ interface LocalButtonProps
   variant?: "primary" | "outline";
 }
 
-const Button = ({
+const _Button = ({
   children,
   variant = "primary",
   className = "",

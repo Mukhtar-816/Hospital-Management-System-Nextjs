@@ -1,19 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
 import { useRouter } from "next/navigation";
-
+import { showToast } from "nextjs-toast-notify";
+import React from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Forms";
-import { showToast } from "nextjs-toast-notify";
 
 export default function LoginPage() {
-
   const [form, setForm] = React.useState({
     email: "",
-    password: ""
+    password: "",
   });
 
   const [isLoading, setIsLoading] = React.useState(false);
@@ -25,7 +23,6 @@ export default function LoginPage() {
       [e.target.name]: e.target.value,
     });
   };
-
 
   const router = useRouter();
 
@@ -53,11 +50,11 @@ export default function LoginPage() {
       const role: string = meData.role;
       showToast.success(role);
 
-      if (role == "admin") {
+      if (role === "admin") {
         router.push("/admin/dashboard");
-      } else if (role == "doctor") {
+      } else if (role === "doctor") {
         router.push("/doctor/dashboard");
-      } else if (role == "receptionist") {
+      } else if (role === "receptionist") {
         router.push("/receptionist/dashboard");
       } else {
         router.push("/patient/dashboard");
@@ -69,7 +66,6 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg p-4">
@@ -116,7 +112,6 @@ export default function LoginPage() {
               {error}
             </p>
           )}
-
 
           <Button type="submit" className="w-full" isLoading={isLoading}>
             Sign In

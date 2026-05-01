@@ -1,24 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { ProfileTemplate } from "@/components/modules/ProfileTemplate";
-import { Input, Select } from "@/components/ui/Forms";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Forms";
 
 export default function DoctorProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const [doctorId, setDoctorId] = useState("");
-
   const [user, setUser] = useState({
-    username: "",
+    userid: "",
     useremail: "",
     role: "doctor",
   });
 
   const [form, setForm] = useState({
+    fullname: "",
     specialization: "",
     status: "active",
   });
@@ -33,16 +33,16 @@ export default function DoctorProfile() {
 
         const data = await res.json();
 
-        setDoctorId(data.doctorid);
-        console.log(data)
+        console.log(data);
 
         setUser({
-          username: data.username,
+          userid: data.userid,
           useremail: data.useremail,
           role: "doctor",
         });
 
         setForm({
+          fullname: data.fullname || "",
           specialization: data.specialization || "",
           status: data.status || "active",
         });
@@ -58,7 +58,7 @@ export default function DoctorProfile() {
 
   // 🔥 HANDLE CHANGE
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -69,10 +69,15 @@ export default function DoctorProfile() {
     setSuccess("");
 
     try {
-      const res = await fetch(`/api/doctor/${doctorId}`, {
+      const res = await fetch("/api/doctor", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          userid: user.userid,
+          useremail: user.useremail,
+          fullname: form.fullname,
+          specialization: form.specialization,
+        }),
       });
 
       if (!res.ok) throw new Error("Update failed");
@@ -89,6 +94,12 @@ export default function DoctorProfile() {
       {success && <p className="text-green-500 text-sm">{success}</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Input
+          name="fullname"
+          label="Full Name"
+          value={form.fullname}
+          onChange={handleChange}
+        />
         <Input
           name="specialization"
           label="Specialization"
