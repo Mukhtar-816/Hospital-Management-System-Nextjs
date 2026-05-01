@@ -4,24 +4,58 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 
+import { useRouter } from "next/navigation";
+import React from "react";
+
 export default function DoctorDashboard() {
+  const router = useRouter();
+  const [data, setData] = React.useState<any>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    async function fetchDashboard() {
+      try {
+        const res = await fetch("/api/doctor/dashboard");
+        const json = await res.json();
+        if (json.success) {
+          setData(json);
+        }
+      } catch (err) {
+        console.error("Failed to load dashboard:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchDashboard();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   const stats = [
     {
       label: "Today's Appointments",
-      value: "8",
+      value: data?.stats.today_appointments || "0",
       icon: "📅",
       color: "text-primary",
     },
-    { label: "Patients Seen", value: "42", icon: "✅", color: "text-success" },
-    { label: "Pending Records", value: "3", icon: "📝", color: "text-warning" },
+    { label: "Patients Seen", value: data?.stats.patients_seen || "0", icon: "✅", color: "text-success" },
+    { label: "Pending Records", value: data?.stats.pending_records || "0", icon: "📝", color: "text-warning" },
   ];
+
+  const nextPatient = data?.nextPatient;
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-text">Doctor Dashboard</h1>
         <p className="text-textMuted">
-          Hello Dr. Johnson, here is your schedule for today.
+          Hello Dr. {data?.doctor?.fullname || "Doctor"}, here is your schedule for today.
         </p>
       </div>
 
@@ -45,28 +79,44 @@ export default function DoctorDashboard() {
           title="Next Patient"
           subtitle="Your immediate upcoming appointment"
         >
-          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/20">
-            <div className="flex items-center gap-6">
-              <div className="w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg shadow-primary/20">
-                JD
-              </div>
-              <div>
-                <h4 className="text-lg font-bold text-text">John Doe</h4>
-                <p className="text-sm text-textMuted">
-                  Male • 28 years • Follow-up
-                </p>
-                <div className="flex gap-2 mt-2">
-                  <Badge variant="warning">High Priority</Badge>
-                  <Badge>Chest Pain</Badge>
+          {nextPatient ? (
+            <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/20">
+              <div className="flex items-center gap-6">
+                <div className="w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg shadow-primary/20">
+                  {nextPatient.patientname.split(' ').map((n: any) => n[0]).join('')}
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-text">{nextPatient.patientname}</h4>
+                  <p className="text-sm text-textMuted">
+                    {nextPatient.gender || "Patient"} • {nextPatient.type || "Checkup"}
+                  </p>
+                  <div className="flex gap-2 mt-2">
+                    {nextPatient.status === 'in_progress' ? (
+                      <Badge variant="info">In Progress</Badge>
+                    ) : (
+                      <Badge variant="warning">Checked In</Badge>
+                    )}
+                  </div>
                 </div>
               </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-primary">
+                  {new Date(nextPatient.starttime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
+                <p className="text-sm text-textMuted">Scheduled Time</p>
+                <Button
+                  className="mt-4"
+                  onClick={() => router.push(`/doctor/interactions/${nextPatient.appointmentid}`)}
+                >
+                  {nextPatient.status === 'in_progress' ? "Continue Interaction" : "Start Interaction"}
+                </Button>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-primary">10:30 AM</p>
-              <p className="text-sm text-textMuted">In 15 minutes</p>
-              <Button className="mt-4">Start Interaction</Button>
+          ) : (
+            <div className="py-8 text-center text-textMuted">
+              No patients currently waiting.
             </div>
-          </div>
+          )}
         </Card>
       </div>
     </div>

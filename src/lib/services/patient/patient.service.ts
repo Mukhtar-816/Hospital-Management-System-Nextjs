@@ -48,3 +48,27 @@ export async function getAllPatients() {
 
   return result.rows;
 }
+
+
+export async function searchPatients(query: string) {
+  const searchTerm = `%${query}%`;
+
+  const result = await pool.query(
+    `
+    SELECT 
+      p.patientid, 
+      p.fullname, 
+      p.patientnumber, 
+      u.useremail 
+    FROM patient p
+    JOIN users u ON p.userid = u.userid
+    WHERE 
+      p.fullname ILIKE $1 OR 
+      u.useremail ILIKE $1 OR 
+      p.patientnumber::text ILIKE $1  
+    `,
+    [searchTerm]
+  );
+
+  return result.rows;
+}

@@ -1,29 +1,58 @@
 "use client";
 
+import React from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Table, TableCell, TableRow } from "@/components/ui/Table";
+import { Modal } from "@/components/ui/Modal";
+import { InteractionDetails } from "@/components/medical/InteractionDetails";
+
+type Appointment = {
+  appointmentId: string;
+  patientId: string;
+  doctorId: string;
+  scheduledAt: string;
+  status: string;
+};
 
 export default function PatientAppointments() {
-  const appointments = [
-    {
-      id: "APP-001",
-      doctor: "Dr. Sarah Johnson",
-      department: "General Medicine",
-      date: "2023-10-24",
-      time: "10:30 AM",
-      status: "pending",
-    },
-    {
-      id: "APP-002",
-      doctor: "Dr. Michael Chen",
-      department: "Dermatology",
-      date: "2023-11-02",
-      time: "02:15 PM",
-      status: "pending",
-    },
-  ];
+  const [appointments, setAppointments] = React.useState<Appointment[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isViewModalOpen, setIsViewModalOpen] = React.useState(false);
+  const [selectedAppId, setSelectedAppId] = React.useState<string | null>(null);
+
+  const loadAppointments = async () => {
+    try {
+      const res = await fetch("/api/appointments/patient");
+      const data = await res.json();
+      if (data.success) {
+        setAppointments(data.appointments);
+      }
+    } catch (error) {
+      console.error("Failed to load appointments:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    loadAppointments();
+  }, []);
+
+  const handleViewRecord = (id: string) => {
+    setSelectedAppId(id);
+    setIsViewModalOpen(true);
+  };
+
+  const statusMap: Record<string, any> = {
+    scheduled: "warning",
+    checked_in: "info",
+    in_progress: "default",
+    completed: "success",
+    no_show: "error",
+    cancelled: "error",
+  };
 
   return (
     <div className="space-y-6">
@@ -36,54 +65,81 @@ export default function PatientAppointments() {
         <Table
           headers={[
             "ID",
-            "Doctor",
-            "Department",
-            "Date & Time",
+            "Doctor ID",
+            "Date",
+            "Time",
             "Status",
             "Actions",
           ]}
         >
-          {appointments.map((app) => (
-            <TableRow key={app.id}>
-              <TableCell className="font-medium text-primary">
-                {app.id}
-              </TableCell>
-              <TableCell>{app.doctor}</TableCell>
-              <TableCell>{app.department}</TableCell>
-              <TableCell>
-                <div className="flex flex-col">
-                  <span className="font-medium">{app.date}</span>
-                  <span className="text-xs text-textMuted">{app.time}</span>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Badge
-                  variant={
-                    app.status as
-                      | "pending"
-                      | "success"
-                      | "info"
-                      | "warning"
-                      | "error"
-                      | "default"
-                  }
-                >
-                  {app.status}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-error hover:bg-error/10"
-                >
-                  Cancel
-                </Button>
+          {isLoading ? (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-8 text-textMuted">
+                Loading appointments...
               </TableCell>
             </TableRow>
-          ))}
+          ) : appointments.length > 0 ? (
+            appointments.map((app) => (
+              <TableRow key={app.appointmentId}>
+                <TableCell className="font-medium text-primary">
+                  {app.appointmentId}
+                </TableCell>
+                <TableCell>{app.doctorId}</TableCell>
+                <TableCell>
+                  {new Date(app.scheduledAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  {new Date(app.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={statusMap[app.status] || "default"}>
+                    {app.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="flex gap-2">
+                  {app.status === "completed" ? (
+                    <Button
+                      size="sm"
+                      onClick={() => handleViewRecord(app.appointmentId)}
+                    >
+                      View Record
+                    </Button>
+                  ) : app.status === "scheduled" ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-error hover:bg-error/10"
+                    >
+                      Cancel
+                    </Button>
+                  ) : (
+                    <span className="text-xs text-textMuted italic">No actions</span>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-8 text-textMuted">
+                No appointments found.
+              </TableCell>
+            </TableRow>
+          )}
         </Table>
       </Card>
+
+      <Modal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        title="Clinical Record"
+        className="max-w-6xl"
+      >
+        {selectedAppId && (
+          <div className="max-h-[80vh] overflow-y-auto pr-2">
+            <InteractionDetails appointmentId={selectedAppId} />
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
