@@ -1,35 +1,35 @@
 "use client";
 
 import Link from "next/link";
+import React from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Table, TableCell, TableRow } from "@/components/ui/Table";
+import { useLoading } from "@/lib/LoadingContext";
 
 export default function PatientRequests() {
-  const requests = [
-    {
-      id: "REQ-001",
-      symptom: "Severe headache and fever",
-      date: "2023-10-20",
-      priority: "High",
-      status: "pending",
-    },
-    {
-      id: "REQ-002",
-      symptom: "Monthly skin checkup",
-      date: "2023-10-18",
-      priority: "Low",
-      status: "success",
-    },
-    {
-      id: "REQ-003",
-      symptom: "Lower back pain",
-      date: "2023-10-15",
-      priority: "Medium",
-      status: "rejected",
-    },
-  ];
+  const { showLoading, hideLoading } = useLoading();
+  const [requests, setRequests] = React.useState<any[]>([]);
+
+  const fetchRequests = async () => {
+    showLoading();
+    try {
+      const res = await fetch("/api/appointmentrequests/patient");
+      const data = await res.json();
+      if (data.success) {
+        setRequests(data.requests);
+      }
+    } catch (error) {
+      console.error("Failed to fetch requests:", error);
+    } finally {
+      hideLoading();
+    }
+  };
+
+  React.useEffect(() => {
+    fetchRequests();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -47,44 +47,40 @@ export default function PatientRequests() {
 
       <Card>
         <Table
-          headers={["Request ID", "Symptoms", "Date", "Priority", "Status"]}
+          headers={["Priority", "Symptoms", "Preferred Time", "Status"]}
         >
-          {requests.map((req) => (
-            <TableRow key={req.id}>
-              <TableCell className="font-medium text-primary">
-                {req.id}
-              </TableCell>
-              <TableCell className="max-w-xs truncate">{req.symptom}</TableCell>
-              <TableCell>{req.date}</TableCell>
-              <TableCell>
-                <span
-                  className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                    req.priority === "High"
-                      ? "bg-error"
-                      : req.priority === "Medium"
-                        ? "bg-warning"
-                        : "bg-success"
-                  }`}
-                />
-                {req.priority}
-              </TableCell>
+          {requests.length > 0 ? requests.map((req) => (
+            <TableRow key={req.requestid}>
               <TableCell>
                 <Badge
                   variant={
-                    req.status as
-                      | "pending"
-                      | "success"
-                      | "info"
-                      | "warning"
-                      | "error"
-                      | "default"
+                    req.priority === "high" ? "error" :
+                    req.priority === "medium" ? "warning" : "info"
+                  }
+                >
+                  {req.priority}
+                </Badge>
+              </TableCell>
+              <TableCell className="max-w-xs truncate">{req.symptoms}</TableCell>
+              <TableCell>{new Date(req.preferredtime).toLocaleString()}</TableCell>
+              <TableCell>
+                <Badge
+                  variant={
+                    req.status === "pending" ? "warning" :
+                    req.status === "approved" ? "success" : "error"
                   }
                 >
                   {req.status}
                 </Badge>
               </TableCell>
             </TableRow>
-          ))}
+          )) : (
+            <TableRow>
+              <TableCell colSpan={4} className="text-center py-8 text-textMuted">
+                No requests found
+              </TableCell>
+            </TableRow>
+          )}
         </Table>
       </Card>
     </div>

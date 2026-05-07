@@ -1,7 +1,9 @@
 import { pool } from "@/lib/db";
+import { PoolClient } from "pg";
 
-export async function createPatient(userid: string, fullname: string) {
-  const result = await pool.query(
+export async function createPatient(userid: string, fullname: string, client?: PoolClient) {
+  const db = client || pool;
+  const result = await db.query(
     `INSERT INTO patient (userid, fullname)
      VALUES ($1, $2)
      RETURNING *`,

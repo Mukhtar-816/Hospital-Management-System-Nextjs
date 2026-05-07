@@ -2,7 +2,7 @@ import type React from "react";
 
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: "success" | "pending" | "rejected" | "info" | "warning";
+  variant?: "success" | "pending" | "rejected" | "info" | "warning" | "error";
   className?: string;
 }
 
@@ -15,6 +15,7 @@ export const Badge = ({
     success: "bg-success/10 text-success border-success/20",
     pending: "bg-warning/10 text-warning border-warning/20",
     rejected: "bg-error/10 text-error border-error/20",
+    error: "bg-error/10 text-error border-error/20",
     warning: "bg-warning/10 text-warning border-warning/20",
     info: "bg-primary/10 text-primary border-primary/20",
   };

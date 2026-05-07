@@ -1,61 +1,68 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
-import {
-  getUserRoleAndPermissions,
-  requirePermission,
-} from "@/lib/auth/permission";
-import * as userService from "@/lib/services/user/user.service";
+import { getUserRoleAndPermissions, requirePermission } from "@/lib/auth/permission";
 import * as doctorService from "@/lib/services/doctor/doctor.service";
+import * as userService from "@/lib/services/user/user.service";
 import { hashPassword } from "@/lib/auth/hash";
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   try {
     const decoded = getUser(req) as { userid: string };
     const access = await getUserRoleAndPermissions(decoded.userid);
-    if (!access) {
-      throw new Error("Forbidden");
-    }
-    requirePermission("admin.read", access);
+    if (!access) throw new Error("Forbidden");
 
-    const body = await req.json();
-    const email = body.useremail ?? body.email;
-    const { password, fullname, specialization } = body;
+    const doctors = await doctorService.getAllDoctors();
 
-    const hashed = await hashPassword(password);
-    const user = await userService.createUser(email, hashed);
-
-    await doctorService.createDoctor(user.userid, fullname, specialization);
-    await userService.assignRole(user.userid, "doctor");
-
-    return Response.json({ success: true, userid: user.userid });
+    return NextResponse.json({ success: true, doctors });
   } catch (err: any) {
-    console.error("CREATE DOCTOR ERROR:", err);
-    return NextResponse.json({ error: err.message || "Failed" }, { status: 500 });
+    console.error("GET DOCTORS ERROR:", err);
+    return NextResponse.json(
+      { error: err.message || "Failed to fetch doctors" },
+      { status: err.message === "Unauthorized" ? 401 : 500 }
+    );
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const decoded = getUser(req) as { userid: string } | null;
+    const access = await getUserRoleAndPermissions(decoded?.userid!);
+    requirePermission("doctor.create", access);
+
+    const { email, useremail, password, fullname, specialization } = await req.json();
+    const targetEmail = useremail ?? email;
+    const hashed = await hashPassword(password);
+
+    const user = await userService.createFullUser({
+      email: targetEmail,
+      passwordHash: hashed,
+      role: "doctor",
+      profileData: { fullname, specialization },
+      profileCreator: async (client, userid, data) => {
+        return await doctorService.createDoctor(userid, data.fullname, data.specialization, client);
+      }
+    });
+
+    return NextResponse.json({ success: true, userid: user.userid });
+  } catch (err: any) {
+    console.error("POST DOCTOR ERROR:", err);
+    return NextResponse.json({ error: err.message || "Failed to create doctor" }, { status: 400 });
   }
 }
 
 export async function PUT(req: Request) {
   try {
-    const decoded = getUser(req) as { userid: string };
-    const access = await getUserRoleAndPermissions(decoded.userid);
-    if (!access) {
-      throw new Error("Forbidden");
-    }
-    requirePermission("admin.read", access);
+    const decoded = getUser(req) as { userid: string } | null;
+    const access = await getUserRoleAndPermissions(decoded?.userid!);
+    requirePermission("doctor.read", access);
 
-    const body = await req.json();
-    const { userid, fullname, specialization } = body;
-
-    const user = await userService.findById(userid);
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    const { userid, fullname, specialization } = await req.json();
 
     await doctorService.updateDoctor(userid, fullname, specialization);
 
-    return Response.json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error("UPDATE DOCTOR ERROR:", err);
-    return NextResponse.json({ error: err.message || "Failed" }, { status: 500 });
+    console.error("PUT DOCTOR ERROR:", err);
+    return NextResponse.json({ error: err.message || "Failed to update doctor" }, { status: 400 });
   }
 }

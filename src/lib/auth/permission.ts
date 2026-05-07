@@ -8,9 +8,8 @@ export interface UserRoleAndPermissions {
 export async function getUserRoleAndPermissions(
   userid: string,
 ): Promise<UserRoleAndPermissions | null> {
-  const client = await pool.connect();
   try {
-    const roleRes = await client.query(
+    const roleRes = await pool.query(
       `SELECT r.name
        FROM role r
        JOIN userrole ur ON r.roleid = ur.roleid
@@ -22,7 +21,7 @@ export async function getUserRoleAndPermissions(
 
     const roleName = roleRes.rows[0].name;
 
-    const permRes = await client.query(
+    const permRes = await pool.query(
       `SELECT p.name
        FROM permission p
        JOIN rolepermission rp ON p.permissionid = rp.permissionid
@@ -34,14 +33,14 @@ export async function getUserRoleAndPermissions(
     const permissions = permRes.rows.map((row) => row.name);
 
     return { role: roleName, permissions };
-  } catch {
+  } catch (error) {
+    console.error("getUserRoleAndPermissions Error:", error);
     return null;
-  } finally {
-    client.release();
   }
 }
 
 export function requirePermission(permission: string, user: any) {
+  if (user?.role === "admin") return;
   if (!user?.permissions?.includes(permission)) {
     throw new Error("Forbidden");
   }

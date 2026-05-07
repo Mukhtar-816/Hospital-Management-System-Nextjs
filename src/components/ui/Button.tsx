@@ -1,4 +1,4 @@
-import type React from "react";
+import { Loader2 } from "lucide-react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "danger" | "outline" | "ghost";
@@ -40,7 +40,7 @@ export const Button = ({
       {...props}
     >
       {isLoading ? (
-        <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
       ) : null}
       {children}
     </button>

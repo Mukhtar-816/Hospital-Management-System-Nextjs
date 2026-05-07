@@ -19,8 +19,6 @@ type Appointment = {
 export default function PatientAppointments() {
   const [appointments, setAppointments] = React.useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [isViewModalOpen, setIsViewModalOpen] = React.useState(false);
-  const [selectedAppId, setSelectedAppId] = React.useState<string | null>(null);
 
   const loadAppointments = async () => {
     try {
@@ -40,10 +38,6 @@ export default function PatientAppointments() {
     loadAppointments();
   }, []);
 
-  const handleViewRecord = (id: string) => {
-    setSelectedAppId(id);
-    setIsViewModalOpen(true);
-  };
 
   const statusMap: Record<string, any> = {
     scheduled: "warning",
@@ -97,14 +91,7 @@ export default function PatientAppointments() {
                   </Badge>
                 </TableCell>
                 <TableCell className="flex gap-2">
-                  {app.status === "completed" ? (
-                    <Button
-                      size="sm"
-                      onClick={() => handleViewRecord(app.appointmentId)}
-                    >
-                      View Record
-                    </Button>
-                  ) : app.status === "scheduled" ? (
+                  {app.status === "scheduled" ? (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -128,18 +115,6 @@ export default function PatientAppointments() {
         </Table>
       </Card>
 
-      <Modal
-        isOpen={isViewModalOpen}
-        onClose={() => setIsViewModalOpen(false)}
-        title="Clinical Record"
-        className="max-w-6xl"
-      >
-        {selectedAppId && (
-          <div className="max-h-[80vh] overflow-y-auto pr-2">
-            <InteractionDetails appointmentId={selectedAppId} />
-          </div>
-        )}
-      </Modal>
     </div>
   );
 }

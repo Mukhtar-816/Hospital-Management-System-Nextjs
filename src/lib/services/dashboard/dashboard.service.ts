@@ -42,11 +42,13 @@ export async function getDoctorDashboardData(userId: string) {
 export async function getPatientDashboardData(userId: string) {
   const statsQuery = `
     SELECT
-      COUNT(*) as total_requests,
-      COUNT(*) FILTER (WHERE status = 'scheduled' AND starttime > NOW()) as upcoming_appointments,
-      COUNT(*) FILTER (WHERE status = 'completed') as past_visits
-    FROM appointment
-    WHERE patientid = (SELECT patientid FROM patient WHERE userid = $1)
+      (SELECT COUNT(*) FROM appointmentrequest WHERE patientid = p.patientid) as total_requests,
+      COUNT(a.*) FILTER (WHERE a.status = 'scheduled' AND a.starttime > NOW()) as upcoming_appointments,
+      COUNT(a.*) FILTER (WHERE a.status = 'completed') as past_visits
+    FROM patient p
+    LEFT JOIN appointment a ON p.patientid = a.patientid
+    WHERE p.userid = $1
+    GROUP BY p.patientid
   `;
 
   const nextAppQuery = `
@@ -69,12 +71,21 @@ export async function getPatientDashboardData(userId: string) {
     (SELECT 
       'Appointment' as type, 
       a.starttime as date, 
-      a.status as status, -- Prefix added here
+      a.status as status,
       'Appointment with ' || d.fullname as title,
       a.appointmentid::text as id
      FROM appointment a 
      JOIN doctor d ON a.doctorid = d.doctorid
      WHERE a.patientid = (SELECT patientid FROM patient WHERE userid = $1))
+    UNION ALL
+    (SELECT 
+      'Request' as type, 
+      ar.createdat as date, 
+      ar.status as status, 
+      'Appointment request submitted' as title,
+      ar.requestid::text as id
+     FROM appointmentrequest ar 
+     WHERE ar.patientid = (SELECT patientid FROM patient WHERE userid = $1))
     UNION ALL
     (SELECT 
       'Record' as type, 
@@ -97,8 +108,41 @@ export async function getPatientDashboardData(userId: string) {
   ]);
 
   return {
-    stats: statsRes.rows[0],
+    stats: statsRes.rows[0] || { total_requests: 0, upcoming_appointments: 0, past_visits: 0 },
     nextAppointment: nextAppRes.rows[0] || null,
     activity: activityRes.rows
+  };
+}
+
+export async function getReceptionistDashboardData() {
+  const statsQuery = `
+    SELECT
+      (SELECT COUNT(*) FROM appointmentrequest WHERE status = 'pending') as pending_requests,
+      (SELECT COUNT(*) FROM appointment WHERE starttime::date = CURRENT_DATE) as today_appointments,
+      (SELECT COUNT(*) FROM patient) as total_patients
+  `;
+
+  const recentRequestsQuery = `
+    SELECT 
+      ar.requestid,
+      p.fullname as patientname,
+      ar.symptoms,
+      ar.priority,
+      ar.preferredtime
+    FROM appointmentrequest ar
+    JOIN patient p ON ar.patientid = p.patientid
+    WHERE ar.status = 'pending'
+    ORDER BY ar.createdat DESC
+    LIMIT 5
+  `;
+
+  const [statsRes, requestsRes] = await Promise.all([
+    pool.query(statsQuery),
+    pool.query(recentRequestsQuery)
+  ]);
+
+  return {
+    stats: statsRes.rows[0],
+    recentRequests: requestsRes.rows
   };
 }

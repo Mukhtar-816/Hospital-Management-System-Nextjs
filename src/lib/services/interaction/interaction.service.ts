@@ -1,4 +1,4 @@
-import { pool } from "@/lib/db";
+import { pool, withTransaction } from "@/lib/db";
 
 export async function saveClinicalData(appointmentId: string, data: {
   notes: string;
@@ -10,11 +10,7 @@ export async function saveClinicalData(appointmentId: string, data: {
     instructions: string
   }[];
 }) {
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-
-    // 1. Create Interaction record
+  return await withTransaction(async (client) => {
     const interactionRes = await client.query(
       `INSERT INTO interaction (appointmentid, notes) 
        VALUES ($1, $2) RETURNING interactionid`,
@@ -22,7 +18,6 @@ export async function saveClinicalData(appointmentId: string, data: {
     );
     const interactionId = interactionRes.rows[0].interactionid;
 
-    // 2. Batch insert diagnoses
     if (data.diagnoses.length > 0) {
       const diagValues = data.diagnoses.map((_, i) => `($1, $${i + 2})`).join(", ");
       await client.query(
@@ -31,7 +26,6 @@ export async function saveClinicalData(appointmentId: string, data: {
       );
     }
 
-    // 3. Batch insert prescriptions
     if (data.prescriptions.length > 0) {
       const prescValues = data.prescriptions.map((_, i) =>
         `($1, $${i * 4 + 2}, $${i * 4 + 3}, $${i * 4 + 4}, $${i * 4 + 5})`
@@ -51,20 +45,13 @@ export async function saveClinicalData(appointmentId: string, data: {
       );
     }
 
-    // 4. Update Appointment status
     await client.query(
       `UPDATE appointment SET status = 'completed' WHERE appointmentid = $1`,
       [appointmentId]
     );
 
-    await client.query("COMMIT");
     return { interactionId };
-  } catch (error) {
-    await client.query("ROLLBACK");
-    throw error;
-  } finally {
-    client.release();
-  }
+  });
 }
 
 export async function getInteractionByAppointment(appointmentId: string) {
@@ -87,4 +74,22 @@ export async function getInteractionByAppointment(appointmentId: string) {
   `;
   const res = await pool.query(query, [appointmentId]);
   return res.rows[0] || null;
+}
+
+export async function getInteractionsByPatientId(patientId: string) {
+  const query = `
+    SELECT 
+      i.interactionid as id,
+      i.createdat as date,
+      d.fullname as doctorname,
+      a.type,
+      a.appointmentid
+    FROM interaction i
+    JOIN appointment a ON i.appointmentid = a.appointmentid
+    JOIN doctor d ON a.doctorid = d.doctorid
+    WHERE a.patientid = $1
+    ORDER BY i.createdat DESC
+  `;
+  const res = await pool.query(query, [patientId]);
+  return res.rows;
 }

@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import { Pool, PoolClient } from "pg";
 
 const globalForPG = globalThis as unknown as {
   pool: Pool | undefined;
@@ -26,4 +26,21 @@ if (!globalForPG.pool) {
     .catch((err) => {
       console.error(" PostgreSQL connection error:", err);
     });
+}
+
+export async function withTransaction<T>(
+  callback: (client: PoolClient) => Promise<T>
+): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const result = await callback(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }

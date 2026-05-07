@@ -5,18 +5,38 @@ import React from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input, Select, Textarea } from "@/components/ui/Forms";
+import { useLoading } from "@/lib/LoadingContext";
 
 export default function NewRequest() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = React.useState(false);
+  const { showLoading, hideLoading } = useLoading();
+  const [formData, setFormData] = React.useState({
+    preferredtime: "",
+    symptoms: "",
+    priority: "low",
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    showLoading();
+    try {
+      const res = await fetch("/api/appointmentrequests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to submit request");
+      }
+
       router.push("/patient/requests");
-    }, 1000);
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
+      hideLoading();
+    }
   };
 
   return (
@@ -34,6 +54,8 @@ export default function NewRequest() {
             label="What symptoms are you experiencing?"
             placeholder="Please describe your symptoms in detail..."
             required
+            value={formData.symptoms}
+            onChange={(e) => setFormData({ ...formData, symptoms: e.target.value })}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -41,13 +63,17 @@ export default function NewRequest() {
               label="Preferred Date & Time"
               type="datetime-local"
               required
+              value={formData.preferredtime}
+              onChange={(e) => setFormData({ ...formData, preferredtime: e.target.value })}
             />
             <Select
               label="Priority Level"
+              value={formData.priority}
+              onChange={(e: any) => setFormData({ ...formData, priority: e.target.value })}
               options={[
-                { value: "low", label: "Low - Routine checkup" },
-                { value: "medium", label: "Medium - Not urgent" },
-                { value: "high", label: "High - Urgent care" },
+                { value: "low", label: "Low - Routine" },
+                { value: "medium", label: "Medium - Urgent" },
+                { value: "high", label: "High - Emergency" },
               ]}
             />
           </div>
@@ -56,7 +82,7 @@ export default function NewRequest() {
             <Button variant="secondary" onClick={() => router.back()}>
               Cancel
             </Button>
-            <Button type="submit" isLoading={isLoading}>
+            <Button type="submit">
               Submit Request
             </Button>
           </div>

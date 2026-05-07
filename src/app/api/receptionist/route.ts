@@ -22,10 +22,16 @@ export async function POST(req: Request) {
     const { password, fullname } = body;
 
     const hashed = await hashPassword(password);
-    const user = await userService.createUser(email, hashed);
     
-    await receptionistService.createReceptionist(user.userid, fullname);
-    await userService.assignRole(user.userid, "receptionist");
+    const user = await userService.createFullUser({
+      email,
+      passwordHash: hashed,
+      role: "receptionist",
+      profileData: { fullname },
+      profileCreator: async (client, userid, data) => {
+        return await receptionistService.createReceptionist(userid, data.fullname, client);
+      }
+    });
 
     return Response.json({ success: true, userid: user.userid });
   } catch (err: any) {

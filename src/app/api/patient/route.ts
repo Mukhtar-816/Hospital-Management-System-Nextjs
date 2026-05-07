@@ -29,12 +29,17 @@ export async function POST(req: Request) {
 
     const { email, useremail, password, fullname } = await req.json();
     const targetEmail = useremail ?? email;
-
     const hashed = await hashPassword(password);
-    const user = await userService.createUser(targetEmail, hashed);
 
-    await patientService.createPatient(user.userid, fullname);
-    await userService.assignRole(user.userid, "patient");
+    const user = await userService.createFullUser({
+      email: targetEmail,
+      passwordHash: hashed,
+      role: "patient",
+      profileData: { fullname },
+      profileCreator: async (client, userid, data) => {
+        return await patientService.createPatient(userid, data.fullname, client);
+      }
+    });
 
     return NextResponse.json({ success: true, userid: user.userid });
   } catch (err: any) {
