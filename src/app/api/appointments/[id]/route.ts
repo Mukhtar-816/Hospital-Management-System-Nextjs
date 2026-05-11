@@ -17,8 +17,6 @@ export async function GET(
             return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
         }
 
-        // Basic security: only doctor or patient involved can see it
-        // Receptionists can see all (for check-in)
         const isReceptionist = access?.role === "receptionist";
         const isAuthorizedDoctor = access?.role === "doctor" && appointment.doctorid === access.id;
         const isAuthorizedPatient = access?.role === "patient" && appointment.patientid === access.id;

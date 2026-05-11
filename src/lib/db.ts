@@ -11,8 +11,8 @@ export const pool =
     ssl: process.env.DATABASE_URL?.includes("localhost")
       ? false
       : {
-          rejectUnauthorized: true,
-        },
+        rejectUnauthorized: true,
+      },
   });
 
 if (!globalForPG.pool) {

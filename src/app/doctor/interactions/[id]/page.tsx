@@ -75,7 +75,6 @@ export default function InteractionPage({
     setIsSubmitting(true);
     showLoading();
     try {
-      // Filter out empty entries
       const finalDiagnoses = diagnoses.map(d => d.value).filter(v => v.trim() !== "");
       const finalPrescriptions = prescriptions
         .filter(p => p.medicine.trim() !== "")

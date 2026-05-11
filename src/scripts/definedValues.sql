@@ -6,25 +6,20 @@ INSERT INTO Role (name) VALUES
 
 INSERT INTO Permission (name) VALUES
 
--- USER
 ('create_user'),
 ('read_user'),
 ('update_user'),
 
--- PATIENT
 ('create_patient'),
 ('read_patient'),
 ('update_patient'),
 
--- DOCTOR
 ('create_doctor'),
 ('read_doctor'),
 ('update_doctor'),
 
--- RECEPTIONIST
 ('create_receptionist'),
 
--- COMMON
 ('read_own_data');
 
 

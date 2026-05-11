@@ -6,14 +6,14 @@ import { useState } from "react";
 import { LogoutButton } from "../ui/LogoutButton";
 import { Sidebar, type UserRole } from "./Sidebar";
 import { ErrorBoundary } from "../common/ErrorBoundary";
-import { 
-  Menu, 
-  X, 
-  Bell, 
+import {
+  Menu,
+  X,
+  Bell,
   Search,
-  Heart
+  Heart,
 } from "lucide-react";
-
+import { useRouter } from 'next/navigation';
 interface DashboardLayoutProps {
   children: React.ReactNode;
   userRole: UserRole;
@@ -25,6 +25,12 @@ export const DashboardLayout = ({
 }: DashboardLayoutProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const _pathname = usePathname();
+  const router = useRouter();
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push('/notifications');
+  };
 
   return (
     <div className="flex h-screen bg-bg overflow-hidden font-sans">
@@ -63,10 +69,10 @@ export const DashboardLayout = ({
             Navigation
           </p>
           <div className="space-y-4">
-             <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                <p className="text-xs text-primary font-bold uppercase mb-1">Access Level</p>
-                <p className="text-sm font-medium text-text capitalize">{userRole}</p>
-             </div>
+            <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
+              <p className="text-xs text-primary font-bold uppercase mb-1">Access Level</p>
+              <p className="text-sm font-medium text-text capitalize">{userRole}</p>
+            </div>
             <LogoutButton className="w-full justify-start py-3 border border-border" />
           </div>
         </div>
@@ -82,11 +88,11 @@ export const DashboardLayout = ({
             >
               <Menu size={24} />
             </button>
-            
+
             <div className="relative hidden md:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={18} />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Search..."
                 className="bg-border/10 border border-border/20 rounded-xl pl-10 pr-4 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/50 w-64 transition-all"
               />
@@ -94,10 +100,7 @@ export const DashboardLayout = ({
           </div>
 
           <div className="flex items-center gap-4">
-            <button
-              type="button"
-              className="p-2 text-textMuted hover:bg-border/10 rounded-xl relative transition-all"
-            >
+            <button onClick={handleClick} className="p-2 text-textMuted hover:bg-border/10 rounded-xl relative transition-all">
               <Bell size={20} />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full border-2 border-surface animate-pulse"></span>
             </button>

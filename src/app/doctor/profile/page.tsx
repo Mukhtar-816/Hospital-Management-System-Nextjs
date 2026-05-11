@@ -35,7 +35,6 @@ export default function DoctorProfile() {
         const data = await res.json();
         console.log(data);
 
-        // setUser(data.doctor);
 
         setForm(data.doctor);
       } catch (err: any) {

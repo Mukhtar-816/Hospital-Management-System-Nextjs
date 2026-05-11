@@ -42,7 +42,6 @@ export async function searchDoctorsForAppointment(filters: {
   const { specialization, appointmentTime } = filters;
   const values: any[] = [appointmentTime];
 
-  // Using double quotes for camelCase column names from your ERD
   let sql = `
     SELECT 
       d.doctorid, 

@@ -8,7 +8,6 @@ export async function GET(req: Request) {
     const decoded = getUser(req) as { userid: string };
     const access = await getUserRoleAndPermissions(decoded.userid);
     
-    // Ensure only admin can access
     requirePermission("admin.read", access);
 
     const stats = await getAdminStats();

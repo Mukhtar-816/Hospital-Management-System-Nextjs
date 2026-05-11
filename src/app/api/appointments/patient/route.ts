@@ -11,7 +11,6 @@ export async function GET(req: Request) {
         if (!access) throw new Error("Forbidden");
         requirePermission("appointment.read", access);
         
-        // Get patient details for the logged-in user
         const patient = await getPatientByUserId(decoded.userid);
         if (!patient) {
             return NextResponse.json({ error: "Patient profile not found" }, { status: 404 });

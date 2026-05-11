@@ -9,7 +9,6 @@ export async function GET(req: Request) {
         const decoded = await getUser(req) as { userid: string } | null;
         if (!decoded) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        // Check if user has permission to book/view appointments
         const access = await getUserRoleAndPermissions(decoded.userid);
         requirePermission("appointment.create", access);
 

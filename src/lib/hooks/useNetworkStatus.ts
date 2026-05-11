@@ -6,7 +6,6 @@ export function useNetworkStatus() {
   const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
-    // Only run on client
     if (typeof window === "undefined") return;
 
     const handleOnline = () => setIsOnline(true);

@@ -20,7 +20,6 @@ export async function GET(
             return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
         }
 
-        // Security check: Match logged-in user with appointment participants
         // const isAuthorized = (appointment.doctorid === access.id) || (appointment.patientid === access.id);
 
         // if (!isAuthorized) {
