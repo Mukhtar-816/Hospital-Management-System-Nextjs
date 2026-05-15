@@ -1,15 +1,15 @@
-"use client"; import { devLog, devError } from "@/lib/logger";
-
-import React from "react";
+"use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React from "react";
+import { InteractionDetails } from "@/components/medical/InteractionDetails";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Table, TableCell, TableRow } from "@/components/ui/Table";
-import { useRouter } from "next/navigation";
-import { useLoading } from "@/lib/LoadingContext";
 import { Modal } from "@/components/ui/Modal";
-import { InteractionDetails } from "@/components/medical/InteractionDetails";
+import { Table, TableCell, TableRow } from "@/components/ui/Table";
+import { useLoading } from "@/lib/LoadingContext";
+import { devError, devLog } from "@/lib/logger";
 
 type Appointment = {
   appointmentId: string;
@@ -48,7 +48,7 @@ export default function DoctorAppointments() {
   const statusMap: Record<string, any> = {
     scheduled: "warning",
     checked_in: "info",
-    in_progress: "default",
+    in_progress: "info",
     completed: "success",
     no_show: "error",
     cancelled: "error",
@@ -90,11 +90,21 @@ export default function DoctorAppointments() {
 
       <Card>
         <Table
-          headers={["Appointment ID", "Patient ID", "Date", "Time", "Status", "Actions"]}
+          headers={[
+            "Appointment ID",
+            "Patient ID",
+            "Date",
+            "Time",
+            "Status",
+            "Actions",
+          ]}
         >
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-textMuted">
+              <TableCell
+                colSpan={6}
+                className="text-center py-8 text-textMuted"
+              >
                 Loading appointments...
               </TableCell>
             </TableRow>
@@ -109,10 +119,13 @@ export default function DoctorAppointments() {
                   {new Date(app.scheduledAt).toLocaleDateString()}
                 </TableCell>
                 <TableCell className="font-semibold text-primary">
-                  {new Date(app.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {new Date(app.scheduledAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={statusMap[app.status] || "default"}>
+                  <Badge variant={statusMap[app.status] || "info"}>
                     {app.status}
                   </Badge>
                 </TableCell>
@@ -120,7 +133,9 @@ export default function DoctorAppointments() {
                   {app.status === "checked_in" && (
                     <Button
                       size="sm"
-                      onClick={() => handleStatusUpdate(app.appointmentId, "start")}
+                      onClick={() =>
+                        handleStatusUpdate(app.appointmentId, "start")
+                      }
                     >
                       Start Session
                     </Button>
@@ -129,7 +144,9 @@ export default function DoctorAppointments() {
                     <Button
                       size="sm"
                       variant="secondary"
-                      onClick={() => router.push(`/doctor/interactions/${app.appointmentId}`)}
+                      onClick={() =>
+                        router.push(`/doctor/interactions/${app.appointmentId}`)
+                      }
                     >
                       Continue Session
                     </Button>
@@ -148,7 +165,10 @@ export default function DoctorAppointments() {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-textMuted">
+              <TableCell
+                colSpan={6}
+                className="text-center py-8 text-textMuted"
+              >
                 No appointments found.
               </TableCell>
             </TableRow>

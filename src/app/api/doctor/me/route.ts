@@ -1,9 +1,12 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
-import { getUserRoleAndPermissions, requirePermission } from "@/lib/auth/permission";
+import {
+  getUserRoleAndPermissions,
+  requirePermission,
+} from "@/lib/auth/permission";
 import { getDoctorByUserId } from "@/lib/services/doctor/doctor.service";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const decoded = getUser(req) as { userid: string };
     const access = await getUserRoleAndPermissions(decoded.userid);
@@ -25,6 +28,9 @@ export async function GET(req: Request) {
     if (err.message === "Forbidden") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-    return NextResponse.json({ error: err.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: err.message || "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

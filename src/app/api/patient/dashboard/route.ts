@@ -1,10 +1,10 @@
-import { devLog, devError } from "@/lib/logger";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { getUserRoleAndPermissions } from "@/lib/auth/permission";
+import { devError, devLog } from "@/lib/logger";
 import { getPatientDashboardData } from "@/lib/services/dashboard/dashboard.service";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const decoded = getUser(req) as { userid: string };
     const access = await getUserRoleAndPermissions(decoded.userid);

@@ -52,12 +52,12 @@ export async function getAdminAppointmentAnalytics() {
   const [statusRes, requestRes, doctorRes] = await Promise.all([
     pool.query(statusQuery),
     pool.query(requestStatusQuery),
-    pool.query(doctorPerformanceQuery)
+    pool.query(doctorPerformanceQuery),
   ]);
 
   return {
     appointmentsByStatus: statusRes.rows,
     requestsByStatus: requestRes.rows,
-    doctorPerformance: doctorRes.rows
+    doctorPerformance: doctorRes.rows,
   };
 }

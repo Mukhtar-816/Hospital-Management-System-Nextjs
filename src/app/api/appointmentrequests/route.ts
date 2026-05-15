@@ -1,18 +1,21 @@
-import { devLog, devError } from "@/lib/logger";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
-import { getUserRoleAndPermissions, requirePermission } from "@/lib/auth/permission";
+import {
+  getUserRoleAndPermissions,
+  requirePermission,
+} from "@/lib/auth/permission";
+import { devError, devLog } from "@/lib/logger";
 import * as requestService from "@/lib/services/appointment/appointmentRequest.service";
 import { getPatientByUserId } from "@/lib/services/patient/patient.service";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const decoded = getUser(req) as { userid: string };
     const access = await getUserRoleAndPermissions(decoded.userid);
     if (!access) throw new Error("Forbidden");
-    
-    if (access.role !== 'patient') {
-        throw new Error("Only patients can create appointment requests");
+
+    if (access.role !== "patient") {
+      throw new Error("Only patients can create appointment requests");
     }
 
     const patient = await getPatientByUserId(decoded.userid);
@@ -25,7 +28,7 @@ export async function POST(req: Request) {
       patientid: patient.patientid,
       preferredtime,
       symptoms,
-      priority: priority || 'low'
+      priority: priority || "low",
     });
 
     return NextResponse.json({ success: true, request });
@@ -33,19 +36,26 @@ export async function POST(req: Request) {
     devError("CREATE REQUEST ERROR:", err);
     return NextResponse.json(
       { error: err.message || "Failed to create request" },
-      { status: err.message === "Unauthorized" ? 401 : err.message === "Forbidden" ? 403 : 500 }
+      {
+        status:
+          err.message === "Unauthorized"
+            ? 401
+            : err.message === "Forbidden"
+              ? 403
+              : 500,
+      },
     );
   }
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const decoded = getUser(req) as { userid: string };
     const access = await getUserRoleAndPermissions(decoded.userid);
     if (!access) throw new Error("Forbidden");
-    
-    if (access.role !== 'receptionist' && access.role !== 'admin') {
-        throw new Error("Unauthorized access to requests");
+
+    if (access.role !== "receptionist" && access.role !== "admin") {
+      throw new Error("Unauthorized access to requests");
     }
 
     const requests = await requestService.getAppointmentRequests();
@@ -55,7 +65,7 @@ export async function GET(req: Request) {
     devError("GET REQUESTS ERROR:", err);
     return NextResponse.json(
       { error: err.message || "Failed to fetch requests" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

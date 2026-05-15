@@ -48,8 +48,10 @@ export default function LoginPage() {
       const meData = await meRes.json();
 
       const role: string = meData.role;
-      if (typeof document !== 'undefined') {
-        document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+      if (typeof document !== "undefined") {
+        document
+          .querySelectorAll(".toast-nextjs, .toast-container")
+          .forEach((el) => el.remove());
       }
       showToast.success("Successfully Logged In");
 
@@ -63,8 +65,10 @@ export default function LoginPage() {
         router.push("/patient/dashboard");
       }
     } catch (err: any) {
-      if (typeof document !== 'undefined') {
-        document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+      if (typeof document !== "undefined") {
+        document
+          .querySelectorAll(".toast-nextjs, .toast-container")
+          .forEach((el) => el.remove());
       }
       showToast.error(err.message || "Something went wrong");
       setError(err.message || "Something went wrong. Please try again.");

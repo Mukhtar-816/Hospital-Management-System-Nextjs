@@ -1,16 +1,16 @@
 "use client";
 
+import { AlertCircle, Calendar, Clock, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { showToast } from "nextjs-toast-notify";
 import React from "react";
-import { devLog, devError } from "@/lib/logger";
 import { Badge, Skeleton } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Table, TableCell, TableRow } from "@/components/ui/Table";
 import { Modal } from "@/components/ui/Modal";
+import { Table, TableCell, TableRow } from "@/components/ui/Table";
 import { useLoading } from "@/lib/LoadingContext";
-import { Calendar, Clock, User, AlertCircle } from "lucide-react";
-import { showToast } from "nextjs-toast-notify";
-import { useRouter } from "next/navigation";
+import { devError, devLog } from "@/lib/logger";
 
 type Appointment = {
   appointmentId: string;
@@ -24,7 +24,9 @@ export default function PatientAppointments() {
   const { showLoading, hideLoading } = useLoading();
   const [appointments, setAppointments] = React.useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [selectedApp, setSelectedApp] = React.useState<Appointment | null>(null);
+  const [selectedApp, setSelectedApp] = React.useState<Appointment | null>(
+    null,
+  );
 
   const loadAppointments = async () => {
     try {
@@ -75,10 +77,20 @@ export default function PatientAppointments() {
     <div className="space-y-8 pb-20">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-black text-text tracking-tight">My Appointments</h1>
-          <p className="text-textMuted font-medium italic mt-1">Track your healthcare journey and upcoming consultations.</p>
+          <h1 className="text-3xl font-black text-text tracking-tight">
+            My Appointments
+          </h1>
+          <p className="text-textMuted font-medium italic mt-1">
+            Track your healthcare journey and upcoming consultations.
+          </p>
         </div>
-        <Button onClick={() => { router.push("/patient/requests/new") }} variant="primary" className="rounded-2xl shadow-xl shadow-primary/20">
+        <Button
+          onClick={() => {
+            router.push("/patient/requests/new");
+          }}
+          variant="primary"
+          className="rounded-2xl shadow-xl shadow-primary/20"
+        >
           Request Appointment
         </Button>
       </div>
@@ -94,13 +106,15 @@ export default function PatientAppointments() {
           ]}
         >
           {isLoading ? (
-            Array(5).fill(0).map((_, i) => (
-              <TableRow key={i}>
-                <TableCell colSpan={5} className="py-6">
-                  <Skeleton className="h-10 w-full" />
-                </TableCell>
-              </TableRow>
-            ))
+            Array(5)
+              .fill(0)
+              .map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell colSpan={5} className="py-6">
+                    <Skeleton className="h-10 w-full" />
+                  </TableCell>
+                </TableRow>
+              ))
           ) : appointments.length > 0 ? (
             appointments.map((app) => (
               <TableRow
@@ -114,8 +128,12 @@ export default function PatientAppointments() {
                       <Calendar size={18} />
                     </div>
                     <div>
-                      <p className="font-black text-text">#{app.appointmentId}</p>
-                      <p className="text-[10px] text-textMuted font-black uppercase tracking-widest">Consultation</p>
+                      <p className="font-black text-text">
+                        #{app.appointmentId}
+                      </p>
+                      <p className="text-[10px] text-textMuted font-black uppercase tracking-widest">
+                        Consultation
+                      </p>
                     </div>
                   </div>
                 </TableCell>
@@ -129,20 +147,36 @@ export default function PatientAppointments() {
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">
-                    <p className="font-bold text-text">{new Date(app.scheduledAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}</p>
+                    <p className="font-bold text-text">
+                      {new Date(app.scheduledAt).toLocaleDateString(undefined, {
+                        dateStyle: "medium",
+                      })}
+                    </p>
                     <div className="flex items-center gap-1.5 text-xs text-textMuted font-medium">
                       <Clock size={12} />
-                      {new Date(app.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(app.scheduledAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={statusMap[app.status.toLowerCase()] || "info"} dot>
+                  <Badge
+                    variant={statusMap[app.status.toLowerCase()] || "info"}
+                    dot
+                  >
                     {app.status.toUpperCase()}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" className="font-black text-[10px] uppercase tracking-[0.2em] text-primary">View Details</Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="font-black text-[10px] uppercase tracking-[0.2em] text-primary"
+                  >
+                    View Details
+                  </Button>
                 </TableCell>
               </TableRow>
             ))
@@ -153,8 +187,12 @@ export default function PatientAppointments() {
                   <div className="p-4 bg-border/5 rounded-full text-textMuted">
                     <Calendar size={32} />
                   </div>
-                  <p className="text-textMuted font-medium">No appointments found in your record.</p>
-                  <Button variant="outline" size="sm" className="mt-2">Book Your First Visit</Button>
+                  <p className="text-textMuted font-medium">
+                    No appointments found in your record.
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-2">
+                    Book Your First Visit
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
@@ -175,32 +213,53 @@ export default function PatientAppointments() {
                 <Calendar size={32} />
               </div>
               <div>
-                <p className="text-[10px] text-textMuted font-black uppercase tracking-widest mb-1">Appointment ID</p>
-                <p className="text-xl font-black text-text">#{selectedApp.appointmentId}</p>
+                <p className="text-[10px] text-textMuted font-black uppercase tracking-widest mb-1">
+                  Appointment ID
+                </p>
+                <p className="text-xl font-black text-text">
+                  #{selectedApp.appointmentId}
+                </p>
               </div>
             </div>
 
             <div className="space-y-4 px-2">
               <div className="flex justify-between items-center py-3 border-b border-border/50">
-                <span className="text-[10px] font-black text-textMuted uppercase">Current Status</span>
-                <Badge variant={statusMap[selectedApp.status.toLowerCase()] || "info"} dot>
+                <span className="text-[10px] font-black text-textMuted uppercase">
+                  Current Status
+                </span>
+                <Badge
+                  variant={
+                    statusMap[selectedApp.status.toLowerCase()] || "info"
+                  }
+                  dot
+                >
                   {selectedApp.status.toUpperCase()}
                 </Badge>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-border/50">
-                <span className="text-[10px] font-black text-textMuted uppercase">Assigned Doctor</span>
-                <span className="text-sm font-bold text-text">Dr. {selectedApp.doctorId}</span>
+                <span className="text-[10px] font-black text-textMuted uppercase">
+                  Assigned Doctor
+                </span>
+                <span className="text-sm font-bold text-text">
+                  Dr. {selectedApp.doctorId}
+                </span>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-border/50">
-                <span className="text-[10px] font-black text-textMuted uppercase">Date & Time</span>
+                <span className="text-[10px] font-black text-textMuted uppercase">
+                  Date & Time
+                </span>
                 <span className="text-sm font-bold text-text">
-                  {new Date(selectedApp.scheduledAt).toLocaleDateString()} @ {new Date(selectedApp.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {new Date(selectedApp.scheduledAt).toLocaleDateString()} @{" "}
+                  {new Date(selectedApp.scheduledAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </span>
               </div>
             </div>
 
             <div className="pt-4 px-2 space-y-3">
-              {selectedApp.status === 'scheduled' && (
+              {selectedApp.status === "scheduled" && (
                 <Button
                   className="w-full h-14 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-red-500/10"
                   variant="danger"
@@ -210,9 +269,13 @@ export default function PatientAppointments() {
                 </Button>
               )}
               <div className="p-4 bg-amber-500/5 rounded-2xl border border-amber-500/10 flex items-start gap-3">
-                <AlertCircle size={16} className="text-amber-500 shrink-0 mt-0.5" />
+                <AlertCircle
+                  size={16}
+                  className="text-amber-500 shrink-0 mt-0.5"
+                />
                 <p className="text-[10px] text-amber-800 font-bold leading-relaxed italic">
-                  Cancellations within 24 hours of the appointment may incur a late cancellation fee.
+                  Cancellations within 24 hours of the appointment may incur a
+                  late cancellation fee.
                 </p>
               </div>
             </div>

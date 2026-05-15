@@ -1,9 +1,13 @@
-import { getUserRoleAndPermissions, requirePermission } from "@/lib/auth/permission";
+import { type NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
+import {
+  getUserRoleAndPermissions,
+  requirePermission,
+} from "@/lib/auth/permission";
 import { pool } from "@/lib/db";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -19,7 +23,7 @@ export async function GET(
     );
 
     if (result.rows.length === 0) {
-      return Response.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
     const patient = result.rows[0];
@@ -27,26 +31,28 @@ export async function GET(
     // 1. If has 'patient.read_all', allow access
     const canReadAll = access.permissions.includes("patient.read_all");
     if (canReadAll) {
-      return Response.json({ patient });
+      return NextResponse.json({ patient });
     }
 
     // 2. Otherwise check 'patient.read' + Ownership
     requirePermission("patient.read", access);
 
     if (patient.userid !== decoded.userid) {
-        return Response.json({ error: "Forbidden: You can only view your own profile" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Forbidden: You can only view your own profile" },
+        { status: 403 },
+      );
     }
 
-    return Response.json({ patient });
-
+    return NextResponse.json({ patient });
   } catch (err: any) {
     if (err?.message === "Unauthorized") {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     if (err?.message === "Forbidden") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-    return Response.json(
+    return NextResponse.json(
       { error: err?.message || "Something went wrong" },
       { status: 400 },
     );

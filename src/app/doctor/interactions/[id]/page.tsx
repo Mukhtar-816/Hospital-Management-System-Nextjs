@@ -1,12 +1,12 @@
-"use client"; import { devLog, devError } from "@/lib/logger";
-
+"use client";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { InteractionDetails } from "@/components/medical/InteractionDetails";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input, Textarea } from "@/components/ui/Forms";
 import { useLoading } from "@/lib/LoadingContext";
-import { InteractionDetails } from "@/components/medical/InteractionDetails";
+import { devError, devLog } from "@/lib/logger";
 
 interface DiagnosisEntry {
   id: string;
@@ -58,31 +58,45 @@ export default function InteractionPage({
     setDiagnoses([...diagnoses, { id: `d${Date.now()}`, value: "" }]);
 
   const updateDiagnosis = (id: string, value: string) => {
-    setDiagnoses(diagnoses.map(d => d.id === id ? { ...d, value } : d));
+    setDiagnoses(diagnoses.map((d) => (d.id === id ? { ...d, value } : d)));
   };
 
   const addPrescription = () =>
     setPrescriptions([
       ...prescriptions,
-      { id: `p${Date.now()}`, medicine: "", frequency: "", duration: "", instructions: "" },
+      {
+        id: `p${Date.now()}`,
+        medicine: "",
+        frequency: "",
+        duration: "",
+        instructions: "",
+      },
     ]);
 
-  const updatePrescription = (id: string, field: keyof Omit<PrescriptionEntry, 'id'>, value: string) => {
-    setPrescriptions(prescriptions.map(p => p.id === id ? { ...p, [field]: value } : p));
+  const updatePrescription = (
+    id: string,
+    field: keyof Omit<PrescriptionEntry, "id">,
+    value: string,
+  ) => {
+    setPrescriptions(
+      prescriptions.map((p) => (p.id === id ? { ...p, [field]: value } : p)),
+    );
   };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     showLoading();
     try {
-      const finalDiagnoses = diagnoses.map(d => d.value).filter(v => v.trim() !== "");
+      const finalDiagnoses = diagnoses
+        .map((d) => d.value)
+        .filter((v) => v.trim() !== "");
       const finalPrescriptions = prescriptions
-        .filter(p => p.medicine.trim() !== "")
-        .map(p => ({
+        .filter((p) => p.medicine.trim() !== "")
+        .map((p) => ({
           medicine: p.medicine,
           frequency: p.frequency,
           duration: p.duration,
-          instructions: p.instructions
+          instructions: p.instructions,
         }));
 
       const res = await fetch(`/api/appointments/${params.id}/interaction`, {
@@ -136,7 +150,10 @@ export default function InteractionPage({
               Patient Interaction
             </h1>
             <p className="text-textMuted">
-              {isCompleted ? "View completed record" : "Finalizing appointment record"} (ID: {params.id})
+              {isCompleted
+                ? "View completed record"
+                : "Finalizing appointment record"}{" "}
+              (ID: {params.id})
             </p>
           </div>
         </div>
@@ -180,7 +197,9 @@ export default function InteractionPage({
                     key={diag.id}
                     placeholder="Enter diagnosis..."
                     value={diag.value}
-                    onChange={(e: any) => updateDiagnosis(diag.id, e.target.value)}
+                    onChange={(e: any) =>
+                      updateDiagnosis(diag.id, e.target.value)
+                    }
                   />
                 ))}
               </div>
@@ -211,27 +230,47 @@ export default function InteractionPage({
                       label="Medicine Name"
                       placeholder="e.g. Paracetamol"
                       value={presc.medicine}
-                      onChange={(e: any) => updatePrescription(presc.id, 'medicine', e.target.value)}
+                      onChange={(e: any) =>
+                        updatePrescription(presc.id, "medicine", e.target.value)
+                      }
                     />
                     <div className="grid grid-cols-2 gap-3">
                       <Input
                         label="Frequency"
                         placeholder="e.g. 2x daily"
                         value={presc.frequency}
-                        onChange={(e: any) => updatePrescription(presc.id, 'frequency', e.target.value)}
+                        onChange={(e: any) =>
+                          updatePrescription(
+                            presc.id,
+                            "frequency",
+                            e.target.value,
+                          )
+                        }
                       />
                       <Input
                         label="Duration"
                         placeholder="e.g. 5 days"
                         value={presc.duration}
-                        onChange={(e: any) => updatePrescription(presc.id, 'duration', e.target.value)}
+                        onChange={(e: any) =>
+                          updatePrescription(
+                            presc.id,
+                            "duration",
+                            e.target.value,
+                          )
+                        }
                       />
                     </div>
                     <Input
                       label="Instructions"
                       placeholder="e.g. Take after meals"
                       value={presc.instructions}
-                      onChange={(e: any) => updatePrescription(presc.id, 'instructions', e.target.value)}
+                      onChange={(e: any) =>
+                        updatePrescription(
+                          presc.id,
+                          "instructions",
+                          e.target.value,
+                        )
+                      }
                     />
                   </div>
                 ))}
@@ -253,7 +292,9 @@ export default function InteractionPage({
                   <p className="text-xs font-bold text-primary mb-1">
                     2023-07-22
                   </p>
-                  <p className="text-sm font-medium text-text">Mild Dermatitis</p>
+                  <p className="text-sm font-medium text-text">
+                    Mild Dermatitis
+                  </p>
                   <p className="text-xs text-textMuted">Dr. Michael Chen</p>
                 </div>
               </div>

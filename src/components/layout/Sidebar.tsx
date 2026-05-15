@@ -1,26 +1,26 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Activity,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Heart,
+  LayoutDashboard,
+  Menu,
+  MessageSquare,
+  Settings,
+  User,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
-import { useState, useEffect } from "react";
-import { LogoutButton } from "../ui/LogoutButton";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  LayoutDashboard, 
-  MessageSquare, 
-  Calendar, 
-  FileText, 
-  User, 
-  Users, 
-  Activity,
-  Settings,
-  Heart,
-  ChevronLeft,
-  ChevronRight,
-  Menu
-} from "lucide-react";
+import { LogoutButton } from "../ui/LogoutButton";
 
 export type UserRole = "patient" | "receptionist" | "doctor" | "admin";
 
@@ -61,7 +61,7 @@ export const Sidebar = ({ userRole }: { userRole: UserRole }) => {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const items = navItems[userRole] || [];
-  
+
   const roleBase =
     userRole === "admin"
       ? "/admin"
@@ -72,18 +72,23 @@ export const Sidebar = ({ userRole }: { userRole: UserRole }) => {
           : "/patient";
 
   return (
-    <motion.aside 
+    <motion.aside
       initial={false}
       animate={{ width: isCollapsed ? 80 : 260 }}
       className={cn(
         "h-full bg-surface border-r border-border flex flex-col hidden lg:flex relative transition-all duration-300 ease-in-out z-50",
-        isCollapsed ? "items-center" : ""
+        isCollapsed ? "items-center" : "",
       )}
     >
-      <div className={cn("p-6 w-full flex items-center justify-between", isCollapsed ? "justify-center px-0" : "")}>
+      <div
+        className={cn(
+          "p-6 w-full flex items-center justify-between",
+          isCollapsed ? "justify-center px-0" : "",
+        )}
+      >
         <AnimatePresence mode="wait">
           {!isCollapsed ? (
-            <motion.div 
+            <motion.div
               key="full-logo"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
@@ -93,12 +98,15 @@ export const Sidebar = ({ userRole }: { userRole: UserRole }) => {
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20 shrink-0">
                 <Heart size={22} fill="currentColor" />
               </div>
-              <Link href="/" className="font-bold text-xl tracking-tight text-text hover:text-primary transition-colors whitespace-nowrap">
+              <Link
+                href="/"
+                className="font-bold text-xl tracking-tight text-text hover:text-primary transition-colors whitespace-nowrap"
+              >
                 MedCloud
               </Link>
             </motion.div>
           ) : (
-            <motion.div 
+            <motion.div
               key="collapsed-logo"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -135,7 +143,7 @@ export const Sidebar = ({ userRole }: { userRole: UserRole }) => {
                 isActive
                   ? "bg-primary text-white shadow-lg shadow-primary/20"
                   : "text-textMuted hover:bg-primary/5 hover:text-primary",
-                isCollapsed && "justify-center"
+                isCollapsed && "justify-center",
               )}
             >
               <motion.div
@@ -144,9 +152,9 @@ export const Sidebar = ({ userRole }: { userRole: UserRole }) => {
               >
                 <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
               </motion.div>
-              
+
               {!isCollapsed && (
-                <motion.span 
+                <motion.span
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   className="font-semibold"
@@ -165,7 +173,12 @@ export const Sidebar = ({ userRole }: { userRole: UserRole }) => {
         })}
       </nav>
 
-      <div className={cn("p-4 border-t border-border space-y-2 w-full", isCollapsed ? "items-center px-2" : "")}>
+      <div
+        className={cn(
+          "p-4 border-t border-border space-y-2 w-full",
+          isCollapsed ? "items-center px-2" : "",
+        )}
+      >
         {!isCollapsed && (
           <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
             <p className="text-[10px] text-primary uppercase font-black tracking-widest mb-2">
@@ -173,7 +186,9 @@ export const Sidebar = ({ userRole }: { userRole: UserRole }) => {
             </p>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <p className="text-sm font-bold text-text capitalize">{userRole}</p>
+              <p className="text-sm font-bold text-text capitalize">
+                {userRole}
+              </p>
             </div>
           </div>
         )}
@@ -182,4 +197,3 @@ export const Sidebar = ({ userRole }: { userRole: UserRole }) => {
     </motion.aside>
   );
 };
-

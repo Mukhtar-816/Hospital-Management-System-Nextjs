@@ -1,10 +1,11 @@
-"use client"; import { devLog, devError } from "@/lib/logger";
+"use client";
+import { Shield, User } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { ProfileTemplate } from "@/components/modules/ProfileTemplate";
-import { useLoading } from "@/lib/LoadingContext";
 import { Input } from "@/components/ui/Forms";
-import { User, Shield } from "lucide-react";
+import { useLoading } from "@/lib/LoadingContext";
+import { devError, devLog } from "@/lib/logger";
 
 export default function ReceptionistProfile() {
   const { showLoading, hideLoading } = useLoading();
@@ -40,7 +41,10 @@ export default function ReceptionistProfile() {
             readOnly
             className="pl-10 opacity-80"
           />
-          <User className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors" size={18} />
+          <User
+            className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors"
+            size={18}
+          />
         </div>
         <div className="relative group">
           <Input
@@ -49,12 +53,21 @@ export default function ReceptionistProfile() {
             readOnly
             className="pl-10 opacity-80"
           />
-          <Shield className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors" size={18} />
+          <Shield
+            className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors"
+            size={18}
+          />
         </div>
       </div>
       <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
-        <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Authorization Note</p>
-        <p className="text-sm text-textMuted italic">Your account is provisioned for clinical intake and appointment orchestration. Personal detail updates must be requested via the administration portal.</p>
+        <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">
+          Authorization Note
+        </p>
+        <p className="text-sm text-textMuted italic">
+          Your account is provisioned for clinical intake and appointment
+          orchestration. Personal detail updates must be requested via the
+          administration portal.
+        </p>
       </div>
     </div>
   );

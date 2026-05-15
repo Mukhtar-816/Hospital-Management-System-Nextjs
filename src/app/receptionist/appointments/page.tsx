@@ -1,19 +1,21 @@
-"use client"; import { devLog, devError } from "@/lib/logger";
+"use client";
 
 import React from "react";
+import { AppointmentModal } from "@/components/modules/AppointmentModal";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Table, TableCell, TableRow } from "@/components/ui/Table";
 import { useLoading } from "@/lib/LoadingContext";
-import { AppointmentModal } from "@/components/modules/AppointmentModal";
+import { devError, devLog } from "@/lib/logger";
 
 type BadgeVariant =
-  | "default"
-  | "secondary"
   | "success"
+  | "pending"
+  | "rejected"
+  | "info"
   | "warning"
   | "error"
-  | "info";
+  | "outline";
 
 type Appointment = {
   id: string;
@@ -22,7 +24,13 @@ type Appointment = {
   doctorid: string;
   doctorname: string;
   scheduledat: string;
-  status: "scheduled" | "checked_in" | "in_progress" | "completed" | "no_show" | "cancelled";
+  status:
+    | "scheduled"
+    | "checked_in"
+    | "in_progress"
+    | "completed"
+    | "no_show"
+    | "cancelled";
 };
 
 export default function Receptionist() {
@@ -33,7 +41,7 @@ export default function Receptionist() {
   const statusMap: Record<string, BadgeVariant> = {
     scheduled: "warning",
     checked_in: "info",
-    in_progress: "default",
+    in_progress: "info",
     completed: "success",
     no_show: "error",
     cancelled: "error",
@@ -83,52 +91,54 @@ export default function Receptionist() {
       <Table
         headers={["id", "Patient", "Doctor", "Date/Time", "Status", "Actions"]}
       >
-        {appointments?.length > 0 ? appointments.map((app) => (
-          <TableRow key={app.id}>
-            <TableCell className="font-bold text-primary">
-              {app.id}
-            </TableCell>
-            <TableCell>{app.patientname}</TableCell>
-            <TableCell>{app.doctorname}</TableCell>
-            <TableCell>
-              <p className="text-sm font-medium">
-                {app.scheduledat ? new Date(app.scheduledat).toLocaleDateString() : "N/A"}
-              </p>
-              <p className="text-xs text-textMuted">
-                {app.scheduledat ? new Date(app.scheduledat).toLocaleTimeString() : ""}
-              </p>
-            </TableCell>
-            <TableCell>
-              <Badge variant={statusMap[app.status]}>
-                {app.status}
-              </Badge>
-            </TableCell>
-            <TableCell className="flex gap-2">
-              <Button variant="ghost" size="sm">
-                View
-              </Button>
-              {app.status === "scheduled" && (
-                <>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => handleStatusUpdate(app.id, "checkin")}
-                  >
-                    Check-in
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-error hover:bg-error/10"
-                    onClick={() => handleStatusUpdate(app.id, "no-show")}
-                  >
-                    No-show
-                  </Button>
-                </>
-              )}
-            </TableCell>
-          </TableRow>
-        )) : (
+        {appointments?.length > 0 ? (
+          appointments.map((app) => (
+            <TableRow key={app.id}>
+              <TableCell className="font-bold text-primary">{app.id}</TableCell>
+              <TableCell>{app.patientname}</TableCell>
+              <TableCell>{app.doctorname}</TableCell>
+              <TableCell>
+                <p className="text-sm font-medium">
+                  {app.scheduledat
+                    ? new Date(app.scheduledat).toLocaleDateString()
+                    : "N/A"}
+                </p>
+                <p className="text-xs text-textMuted">
+                  {app.scheduledat
+                    ? new Date(app.scheduledat).toLocaleTimeString()
+                    : ""}
+                </p>
+              </TableCell>
+              <TableCell>
+                <Badge variant={statusMap[app.status]}>{app.status}</Badge>
+              </TableCell>
+              <TableCell className="flex gap-2">
+                <Button variant="ghost" size="sm">
+                  View
+                </Button>
+                {app.status === "scheduled" && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleStatusUpdate(app.id, "checkin")}
+                    >
+                      Check-in
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-error hover:bg-error/10"
+                      onClick={() => handleStatusUpdate(app.id, "no-show")}
+                    >
+                      No-show
+                    </Button>
+                  </>
+                )}
+              </TableCell>
+            </TableRow>
+          ))
+        ) : (
           <TableRow>
             <TableCell colSpan={6} className="text-center py-8 text-textMuted">
               No appointments found

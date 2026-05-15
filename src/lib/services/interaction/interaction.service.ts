@@ -1,53 +1,61 @@
 import { pool, withTransaction } from "@/lib/db";
 
-export async function saveClinicalData(appointmentId: string, data: {
-  notes: string;
-  diagnoses: string[];
-  prescriptions: {
-    medicine: string;
-    frequency: string;
-    duration: string;
-    instructions: string
-  }[];
-}) {
+export async function saveClinicalData(
+  appointmentId: string,
+  data: {
+    notes: string;
+    diagnoses: string[];
+    prescriptions: {
+      medicine: string;
+      frequency: string;
+      duration: string;
+      instructions: string;
+    }[];
+  },
+) {
   return await withTransaction(async (client) => {
     const interactionRes = await client.query(
       `INSERT INTO interaction (appointmentid, notes) 
        VALUES ($1, $2) RETURNING interactionid`,
-      [appointmentId, data.notes]
+      [appointmentId, data.notes],
     );
     const interactionId = interactionRes.rows[0].interactionid;
 
     if (data.diagnoses.length > 0) {
-      const diagValues = data.diagnoses.map((_, i) => `($1, $${i + 2})`).join(", ");
+      const diagValues = data.diagnoses
+        .map((_, i) => `($1, $${i + 2})`)
+        .join(", ");
       await client.query(
         `INSERT INTO diagnosis (interactionid, description) VALUES ${diagValues}`,
-        [interactionId, ...data.diagnoses]
+        [interactionId, ...data.diagnoses],
       );
     }
 
     if (data.prescriptions.length > 0) {
-      const prescValues = data.prescriptions.map((_, i) =>
-        `($1, $${i * 4 + 2}, $${i * 4 + 3}, $${i * 4 + 4}, $${i * 4 + 5})`
-      ).join(", ");
+      const prescValues = data.prescriptions
+        .map(
+          (_, i) =>
+            `($1, $${i * 4 + 2}, $${i * 4 + 3}, $${i * 4 + 4}, $${i * 4 + 5})`,
+        )
+        .join(", ");
 
-      const flattenedPresc = data.prescriptions.flatMap(p => [
+      const flattenedPresc = data.prescriptions.flatMap((p) => [
         p.medicine,
         p.frequency,
         p.duration,
-        p.instructions
+        p.instructions,
       ]);
 
       await client.query(
         `INSERT INTO prescription (interactionid, medicine, frequency, duration, instructions) 
          VALUES ${prescValues}`,
-        [interactionId, ...flattenedPresc]
+        [interactionId, ...flattenedPresc],
       );
     }
 
     await client.query(
       `UPDATE appointment SET status = 'completed' WHERE appointmentid = $1`,
-      [appointmentId]
+      [appointmentId],
     );
 
     return { interactionId };

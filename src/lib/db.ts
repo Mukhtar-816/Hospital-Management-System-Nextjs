@@ -1,5 +1,5 @@
-import { devLog, devError } from "@/lib/logger";
-import { Pool, PoolClient } from "pg";
+import { Pool, type PoolClient } from "pg";
+import { devError, devLog } from "@/lib/logger";
 
 const globalForPG = globalThis as unknown as {
   pool: Pool | undefined;
@@ -12,8 +12,8 @@ export const pool =
     ssl: process.env.DATABASE_URL?.includes("localhost")
       ? false
       : {
-        rejectUnauthorized: true,
-      },
+          rejectUnauthorized: true,
+        },
   });
 
 if (!globalForPG.pool) {
@@ -30,7 +30,7 @@ if (!globalForPG.pool) {
 }
 
 export async function withTransaction<T>(
-  callback: (client: PoolClient) => Promise<T>
+  callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
   const client = await pool.connect();
   try {

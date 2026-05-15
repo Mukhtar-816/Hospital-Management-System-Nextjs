@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { devLog, devError } from "@/lib/logger";
+import { InteractionDetails } from "@/components/medical/InteractionDetails";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Table, TableCell, TableRow } from "@/components/ui/Table";
 import { Modal } from "@/components/ui/Modal";
-import { InteractionDetails } from "@/components/medical/InteractionDetails";
+import { Table, TableCell, TableRow } from "@/components/ui/Table";
 import { useLoading } from "@/lib/LoadingContext";
+import { devError, devLog } from "@/lib/logger";
 
 export default function PatientRecords() {
   const { showLoading, hideLoading } = useLoading();
@@ -44,21 +44,19 @@ export default function PatientRecords() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-text">Medical Records</h1>
-        <p className="text-textMuted">View your past consultation records and prescriptions.</p>
+        <p className="text-textMuted">
+          View your past consultation records and prescriptions.
+        </p>
       </div>
 
       <Card>
-        <Table
-          headers={[
-            "Date",
-            "Doctor",
-            "Type",
-            "Actions",
-          ]}
-        >
+        <Table headers={["Date", "Doctor", "Type", "Actions"]}>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-8 text-textMuted">
+              <TableCell
+                colSpan={4}
+                className="text-center py-8 text-textMuted"
+              >
                 Loading records...
               </TableCell>
             </TableRow>
@@ -68,7 +66,9 @@ export default function PatientRecords() {
                 <TableCell>
                   {new Date(record.date).toLocaleDateString()}
                 </TableCell>
-                <TableCell className="font-medium">Dr. {record.doctorname}</TableCell>
+                <TableCell className="font-medium">
+                  Dr. {record.doctorname}
+                </TableCell>
                 <TableCell>
                   <Badge variant="info">{record.type}</Badge>
                 </TableCell>
@@ -84,7 +84,10 @@ export default function PatientRecords() {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-8 text-textMuted">
+              <TableCell
+                colSpan={4}
+                className="text-center py-8 text-textMuted"
+              >
                 No medical records found.
               </TableCell>
             </TableRow>

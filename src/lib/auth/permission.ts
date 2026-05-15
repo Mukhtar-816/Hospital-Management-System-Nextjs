@@ -1,4 +1,4 @@
-import { devLog, devError } from "@/lib/logger";
+import { devError, devLog } from "@/lib/logger";
 import { pool } from "../db";
 
 export interface UserRoleAndPermissions {
@@ -46,4 +46,3 @@ export function requirePermission(permission: string, user: any) {
     throw new Error("Forbidden");
   }
 }
-

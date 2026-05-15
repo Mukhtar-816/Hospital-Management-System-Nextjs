@@ -1,13 +1,14 @@
-import { devLog, devError } from "@/lib/logger";
+import { type NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
+import { hashPassword } from "@/lib/auth/hash";
 import {
   getUserRoleAndPermissions,
   requirePermission,
 } from "@/lib/auth/permission";
+import { devError, devLog } from "@/lib/logger";
 import * as userService from "@/lib/services/user/user.service";
-import { hashPassword } from "@/lib/auth/hash";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const decoded = getUser(req) as { userid: string };
     const access = await getUserRoleAndPermissions(decoded.userid);
@@ -18,23 +19,23 @@ export async function GET(req: Request) {
 
     const users = await userService.getUsersForAdminDashboard();
 
-    return Response.json(users);
+    return NextResponse.json(users);
   } catch (err: any) {
-    devLog(err)
+    devLog(err);
     if (err?.message === "Unauthorized") {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     if (err?.message === "Forbidden") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-    return Response.json(
+    return NextResponse.json(
       { error: err?.message || "Something went wrong" },
       { status: 400 },
     );
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const decoded = getUser(req) as { userid: string };
     const access = await getUserRoleAndPermissions(decoded.userid);
@@ -49,10 +50,10 @@ export async function POST(req: Request) {
     const hashed = await hashPassword(password);
     const user = await userService.createUser(email, hashed);
 
-    return Response.json({ success: true, user });
+    return NextResponse.json({ success: true, user });
   } catch (err: any) {
     devError("ADMIN CREATE USER ERROR:", err);
-    return Response.json(
+    return NextResponse.json(
       { error: err?.message || "Something went wrong" },
       { status: 400 },
     );

@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
+import { type NextRequest, NextResponse } from "next/server";
 import { login } from "../../../../lib/services/auth/auth.service";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
@@ -13,9 +14,9 @@ export async function POST(req: Request) {
       path: "/",
       maxAge: 60 * 60 * 24 * 7,
     });
-    return Response.json(result);
+    return NextResponse.json(result);
   } catch (err: any) {
-    return Response.json(
+    return NextResponse.json(
       { error: err.message || "Something went wrong" },
       { status: 400 },
     );

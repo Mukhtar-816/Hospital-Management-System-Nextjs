@@ -7,7 +7,9 @@ export interface Notification {
   userid: string;
 }
 
-export async function getNotificationsByUserId(userId: string): Promise<Notification[]> {
+export async function getNotificationsByUserId(
+  userId: string,
+): Promise<Notification[]> {
   const result = await pool.query(
     `SELECT 
       notificationId as "notificationId", 
@@ -16,7 +18,7 @@ export async function getNotificationsByUserId(userId: string): Promise<Notifica
     FROM Notifications 
     WHERE userid = $1 
     ORDER BY TStamp DESC`,
-    [userId]
+    [userId],
   );
   return result.rows;
 }

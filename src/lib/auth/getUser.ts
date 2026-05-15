@@ -1,6 +1,7 @@
+import type { NextRequest } from "next/server";
 import { verifyToken } from "./jwt";
 
-export function getUser(req: Request) {
+export function getUser(req: NextRequest) {
   try {
     const cookieHeader = req.headers.get("cookie");
 

@@ -22,17 +22,22 @@ export const Card = ({
     <div
       className={cn(
         "bg-surface border border-border rounded-2xl shadow-sm overflow-hidden transition-all duration-300",
-        hoverable && "hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 hover:border-primary/20",
-        className
+        hoverable &&
+          "hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 hover:border-primary/20",
+        className,
       )}
     >
       {(title || subtitle) && (
         <div className="px-6 py-5 border-b border-border/50 bg-surface/50 backdrop-blur-sm">
           {title && (
-            <div className="text-lg font-bold text-text tracking-tight">{title}</div>
+            <div className="text-lg font-bold text-text tracking-tight">
+              {title}
+            </div>
           )}
           {subtitle && (
-            <p className="text-sm text-textMuted mt-1 font-medium">{subtitle}</p>
+            <p className="text-sm text-textMuted mt-1 font-medium">
+              {subtitle}
+            </p>
           )}
         </div>
       )}
@@ -45,4 +50,3 @@ export const Card = ({
     </div>
   );
 };
-

@@ -9,15 +9,7 @@ export type ValidationConfig = {
 };
 
 export function validateInput(config: ValidationConfig) {
-  const {
-    type,
-    value,
-    min,
-    max,
-    minLength,
-    maxLength,
-    fieldName,
-  } = config;
+  const { type, value, min, max, minLength, maxLength, fieldName } = config;
 
   if (value === undefined || value === null || value === "") {
     return `${fieldName} is required`;

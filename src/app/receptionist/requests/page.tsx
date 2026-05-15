@@ -1,12 +1,12 @@
-"use client"; import { devLog, devError } from "@/lib/logger";
-
+"use client";
 import React from "react";
+import { AppointmentModal } from "@/components/modules/AppointmentModal";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Table, TableCell, TableRow } from "@/components/ui/Table";
 import { useLoading } from "@/lib/LoadingContext";
-import { AppointmentModal } from "@/components/modules/AppointmentModal";
+import { devError, devLog } from "@/lib/logger";
 
 export default function ReceptionistRequests() {
   const { showLoading, hideLoading } = useLoading();
@@ -32,15 +32,15 @@ export default function ReceptionistRequests() {
 
   const handleApproveClick = (req: any) => {
     const dateObj = new Date(req.preferredtime);
-    const date = dateObj.toISOString().split('T')[0];
-    const time = dateObj.toTimeString().split(' ')[0].substring(0, 5);
+    const date = dateObj.toISOString().split("T")[0];
+    const time = dateObj.toTimeString().split(" ")[0].substring(0, 5);
 
     setSelectedRequest({
       patientid: req.patientid,
       patientname: req.patientname,
       date,
       time,
-      requestid: req.requestid
+      requestid: req.requestid,
     });
     setIsModalOpen(true);
   };
@@ -87,49 +87,66 @@ export default function ReceptionistRequests() {
             "Actions",
           ]}
         >
-          {requests.length > 0 ? requests.map((req) => (
-            <TableRow key={req.requestid}>
-              <TableCell className="font-medium">{req.patientname}</TableCell>
-              <TableCell>
-                <Badge
-                  variant={
-                    req.priority === "high" ? "error" :
-                      req.priority === "medium" ? "warning" : "info"
-                  }
-                >
-                  {req.priority}
-                </Badge>
-              </TableCell>
-              <TableCell className="max-w-xs truncate">{req.symptoms}</TableCell>
-              <TableCell className="text-sm">
-                {new Date(req.preferredtime).toLocaleString()}
-              </TableCell>
-              <TableCell>
-                <Badge
-                  variant={
-                    req.status === "pending" ? "warning" :
-                      req.status === "approved" ? "success" : "error"
-                  }
-                >
-                  {req.status}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                {req.status === "pending" && (
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => handleApproveClick(req)}>
-                      Approve
-                    </Button>
-                    <Button size="sm" variant="danger" onClick={() => handleReject(req.requestid)}>
-                      Reject
-                    </Button>
-                  </div>
-                )}
-              </TableCell>
-            </TableRow>
-          )) : (
+          {requests.length > 0 ? (
+            requests.map((req) => (
+              <TableRow key={req.requestid}>
+                <TableCell className="font-medium">{req.patientname}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      req.priority === "high"
+                        ? "error"
+                        : req.priority === "medium"
+                          ? "warning"
+                          : "info"
+                    }
+                  >
+                    {req.priority}
+                  </Badge>
+                </TableCell>
+                <TableCell className="max-w-xs truncate">
+                  {req.symptoms}
+                </TableCell>
+                <TableCell className="text-sm">
+                  {new Date(req.preferredtime).toLocaleString()}
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      req.status === "pending"
+                        ? "warning"
+                        : req.status === "approved"
+                          ? "success"
+                          : "error"
+                    }
+                  >
+                    {req.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {req.status === "pending" && (
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={() => handleApproveClick(req)}>
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => handleReject(req.requestid)}
+                      >
+                        Reject
+                      </Button>
+                    </div>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-textMuted">
+              <TableCell
+                colSpan={6}
+                className="text-center py-8 text-textMuted"
+              >
                 No requests found
               </TableCell>
             </TableRow>
@@ -140,7 +157,10 @@ export default function ReceptionistRequests() {
       {selectedRequest && (
         <AppointmentModal
           isOpen={isModalOpen}
-          onClose={() => { setIsModalOpen(false); setSelectedRequest(null); }}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedRequest(null);
+          }}
           onSuccess={handleAppointmentSuccess}
           initialData={selectedRequest}
         />

@@ -10,8 +10,11 @@ interface CreateAppointmentParams {
 }
 
 export async function createAppointment(data: CreateAppointmentParams) {
-  const { patientid, doctorid, receptionistid, starttime, type, requestid } = data;
-  const isoStartTime = starttime.includes(' ') ? starttime.replace(' ', 'T') : starttime;
+  const { patientid, doctorid, receptionistid, starttime, type, requestid } =
+    data;
+  const isoStartTime = starttime.includes(" ")
+    ? starttime.replace(" ", "T")
+    : starttime;
   const start = new Date(isoStartTime);
 
   if (isNaN(start.getTime())) {
@@ -23,7 +26,7 @@ export async function createAppointment(data: CreateAppointmentParams) {
   return await withTransaction(async (client) => {
     const conflict = await client.query(
       "SELECT 1 FROM appointment WHERE doctorid = $1 AND starttime = $2 AND status != 'cancelled'",
-      [doctorid, starttime]
+      [doctorid, starttime],
     );
 
     if (conflict.rows.length > 0) {
@@ -42,13 +45,21 @@ export async function createAppointment(data: CreateAppointmentParams) {
         status
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'scheduled')
       RETURNING *`,
-      [patientid, doctorid, receptionistid, requestid || null, starttime, endtime, type]
+      [
+        patientid,
+        doctorid,
+        receptionistid,
+        requestid || null,
+        starttime,
+        endtime,
+        type,
+      ],
     );
 
     if (requestid) {
       await client.query(
         `UPDATE appointmentrequest SET status = 'approved', updatedat = NOW() WHERE requestid = $1`,
-        [requestid]
+        [requestid],
       );
     }
 
@@ -74,7 +85,8 @@ export async function getAllAppointments() {
 }
 
 export async function getAppointmentsByDoctorId(doctorid: string) {
-  const result = await pool.query(`
+  const result = await pool.query(
+    `
     SELECT 
       appointmentid as "appointmentId",
       patientid as "patientId",
@@ -84,13 +96,16 @@ export async function getAppointmentsByDoctorId(doctorid: string) {
     FROM appointment
     WHERE doctorid = $1
     ORDER BY starttime DESC
-  `, [doctorid]);
+  `,
+    [doctorid],
+  );
 
   return result.rows;
 }
 
 export async function getAppointmentsByPatientId(patientid: string) {
-  const result = await pool.query(`
+  const result = await pool.query(
+    `
     SELECT 
       appointmentid as "appointmentId",
       patientid as "patientId",
@@ -100,7 +115,9 @@ export async function getAppointmentsByPatientId(patientid: string) {
     FROM appointment
     WHERE patientid = $1
     ORDER BY starttime DESC
-  `, [patientid]);
+  `,
+    [patientid],
+  );
 
   return result.rows;
 }
@@ -108,7 +125,7 @@ export async function getAppointmentsByPatientId(patientid: string) {
 export async function getAppointmentById(id: string) {
   const result = await pool.query(
     `SELECT * FROM appointment WHERE appointmentid = $1`,
-    [id]
+    [id],
   );
   return result.rows[0];
 }
@@ -116,13 +133,15 @@ export async function getAppointmentById(id: string) {
 export async function checkinAppointment(id: string) {
   const appointment = await getAppointmentById(id);
   if (!appointment) throw new Error("Appointment not found");
-  if (appointment.status !== 'scheduled') {
-    throw new Error(`Invalid transition: cannot check-in from status '${appointment.status}'`);
+  if (appointment.status !== "scheduled") {
+    throw new Error(
+      `Invalid transition: cannot check-in from status '${appointment.status}'`,
+    );
   }
 
   const result = await pool.query(
     `UPDATE appointment SET status = 'checked_in' WHERE appointmentid = $1 RETURNING *`,
-    [id]
+    [id],
   );
   return result.rows[0];
 }
@@ -130,13 +149,15 @@ export async function checkinAppointment(id: string) {
 export async function startAppointment(id: string) {
   const appointment = await getAppointmentById(id);
   if (!appointment) throw new Error("Appointment not found");
-  if (appointment.status !== 'checked_in') {
-    throw new Error(`Invalid transition: cannot start from status '${appointment.status}'`);
+  if (appointment.status !== "checked_in") {
+    throw new Error(
+      `Invalid transition: cannot start from status '${appointment.status}'`,
+    );
   }
 
   const result = await pool.query(
     `UPDATE appointment SET status = 'in_progress', starttime = NOW() WHERE appointmentid = $1 RETURNING *`,
-    [id]
+    [id],
   );
   return result.rows[0];
 }
@@ -144,13 +165,15 @@ export async function startAppointment(id: string) {
 export async function completeAppointment(id: string) {
   const appointment = await getAppointmentById(id);
   if (!appointment) throw new Error("Appointment not found");
-  if (appointment.status !== 'in_progress') {
-    throw new Error(`Invalid transition: cannot complete from status '${appointment.status}'`);
+  if (appointment.status !== "in_progress") {
+    throw new Error(
+      `Invalid transition: cannot complete from status '${appointment.status}'`,
+    );
   }
 
   const result = await pool.query(
     `UPDATE appointment SET status = 'completed', endtime = NOW() WHERE appointmentid = $1 RETURNING *`,
-    [id]
+    [id],
   );
   return result.rows[0];
 }
@@ -158,13 +181,15 @@ export async function completeAppointment(id: string) {
 export async function noShowAppointment(id: string) {
   const appointment = await getAppointmentById(id);
   if (!appointment) throw new Error("Appointment not found");
-  if (appointment.status !== 'scheduled') {
-    throw new Error(`Invalid transition: cannot set no-show from status '${appointment.status}'`);
+  if (appointment.status !== "scheduled") {
+    throw new Error(
+      `Invalid transition: cannot set no-show from status '${appointment.status}'`,
+    );
   }
 
   const result = await pool.query(
     `UPDATE appointment SET status = 'no_show' WHERE appointmentid = $1 RETURNING *`,
-    [id]
+    [id],
   );
   return result.rows[0];
 }
@@ -172,7 +197,7 @@ export async function noShowAppointment(id: string) {
 export async function cancelAppointment(id: string) {
   const result = await pool.query(
     `UPDATE appointment SET status = 'cancelled' WHERE appointmentid = $1 RETURNING *`,
-    [id]
+    [id],
   );
   return result.rows[0];
 }

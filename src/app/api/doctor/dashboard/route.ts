@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { getUserRoleAndPermissions } from "@/lib/auth/permission";
 import { getDoctorDashboardData } from "@/lib/services/dashboard/dashboard.service";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const decoded = getUser(req) as { userid: string };
-    const access = await getUserRoleAndPermissions(decoded.userid);
+    const access: any = await getUserRoleAndPermissions(decoded.userid);
 
     if (!access || access.role !== "doctor") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

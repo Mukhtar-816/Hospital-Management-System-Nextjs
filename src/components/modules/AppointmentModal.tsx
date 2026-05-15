@@ -1,27 +1,28 @@
-"use client"; import { devLog, devError } from "@/lib/logger";
-
-import React, { Activity } from "react";
+"use client";
+import {
+  Activity,
+  AlertCircle,
+  Calendar,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Loader2,
+  Search,
+  Stethoscope,
+  User,
+} from "lucide-react";
+import { showToast } from "nextjs-toast-notify";
+import React from "react";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Forms";
 import { Modal } from "@/components/ui/Modal";
-import { Badge } from "@/components/ui/Badge";
-import { useLoading } from "@/lib/LoadingContext";
-import { validateInput } from "@/lib/utils/inputValidator";
-import { handleApiError } from "@/lib/utils/errorHandler";
 import { useNetworkStatus } from "@/lib/hooks/useNetworkStatus";
-import { showToast } from "nextjs-toast-notify";
-import {
-  User,
-  Stethoscope,
-  Calendar,
-  Clock,
-  CheckCircle2,
-  ChevronRight,
-  ChevronLeft,
-  Search,
-  Loader2,
-  AlertCircle
-} from "lucide-react";
+import { useLoading } from "@/lib/LoadingContext";
+import { devError, devLog } from "@/lib/logger";
+import { handleApiError } from "@/lib/utils/errorHandler";
+import { validateInput } from "@/lib/utils/inputValidator";
 
 type Doctor = {
   doctorid: string;
@@ -57,12 +58,19 @@ interface AppointmentModalProps {
   };
 }
 
-export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: AppointmentModalProps) {
+export function AppointmentModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  initialData,
+}: AppointmentModalProps) {
   const { showLoading, hideLoading } = useLoading();
   const isOnline = useNetworkStatus();
   const [currentStep, setCurrentStep] = React.useState(1);
   const [isLoadingDoctors, setIsLoadingDoctors] = React.useState(false);
-  const [patientSearch, setPatientSearch] = React.useState(initialData?.patientname || "");
+  const [patientSearch, setPatientSearch] = React.useState(
+    initialData?.patientname || "",
+  );
   const [patientResults, setPatientResults] = React.useState<any[]>([]);
   const [doctors, setDoctors] = React.useState<Doctor[]>([]);
 
@@ -129,20 +137,29 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
       return;
     }
 
-    const dateErr = validateInput({ type: "date", value: formData.date, fieldName: "Date" });
+    const dateErr = validateInput({
+      type: "date",
+      value: formData.date,
+      fieldName: "Date",
+    });
     if (dateErr) return showToast.error(dateErr);
 
-    const timeErr = validateInput({ type: "time", value: formData.time, fieldName: "Time" });
+    const timeErr = validateInput({
+      type: "time",
+      value: formData.time,
+      fieldName: "Time",
+    });
     if (timeErr) return showToast.error(timeErr);
 
     if (!formData.patientid) return showToast.error("Please select a patient");
-    if (!formData.specialization) return showToast.error("Please select a specialization");
+    if (!formData.specialization)
+      return showToast.error("Please select a specialization");
 
     setIsLoadingDoctors(true);
     try {
       const fullDateTime = `${formData.date} ${formData.time}`;
       const res = await fetch(
-        `/api/doctor/search?specialization=${encodeURIComponent(formData.specialization)}&time=${encodeURIComponent(fullDateTime)}`
+        `/api/doctor/search?specialization=${encodeURIComponent(formData.specialization)}&time=${encodeURIComponent(fullDateTime)}`,
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Search failed");
@@ -207,7 +224,11 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
       footer={
         <div className="flex justify-between w-full">
           {currentStep === 2 && (
-            <Button variant="secondary" className="gap-2" onClick={() => setCurrentStep(1)}>
+            <Button
+              variant="secondary"
+              className="gap-2"
+              onClick={() => setCurrentStep(1)}
+            >
               <ChevronLeft size={16} />
               Back
             </Button>
@@ -244,17 +265,29 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-0.5 bg-border -z-10" />
 
           <div className="flex flex-col items-center gap-2 bg-surface px-2">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${currentStep >= 1 ? "bg-primary text-white shadow-lg shadow-primary/20 scale-110" : "bg-border text-textMuted"}`}>
+            <div
+              className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${currentStep >= 1 ? "bg-primary text-white shadow-lg shadow-primary/20 scale-110" : "bg-border text-textMuted"}`}
+            >
               <User size={20} />
             </div>
-            <span className={`text-[10px] font-black uppercase tracking-widest ${currentStep >= 1 ? "text-primary" : "text-textMuted"}`}>Patient</span>
+            <span
+              className={`text-[10px] font-black uppercase tracking-widest ${currentStep >= 1 ? "text-primary" : "text-textMuted"}`}
+            >
+              Patient
+            </span>
           </div>
 
           <div className="flex flex-col items-center gap-2 bg-surface px-2">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${currentStep === 2 ? "bg-primary text-white shadow-lg shadow-primary/20 scale-110" : "bg-border text-textMuted"}`}>
+            <div
+              className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${currentStep === 2 ? "bg-primary text-white shadow-lg shadow-primary/20 scale-110" : "bg-border text-textMuted"}`}
+            >
               <Stethoscope size={20} />
             </div>
-            <span className={`text-[10px] font-black uppercase tracking-widest ${currentStep === 2 ? "text-primary" : "text-textMuted"}`}>Doctor</span>
+            <span
+              className={`text-[10px] font-black uppercase tracking-widest ${currentStep === 2 ? "text-primary" : "text-textMuted"}`}
+            >
+              Doctor
+            </span>
           </div>
         </div>
 
@@ -269,7 +302,10 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
                 disabled={!!formData.requestid}
                 className="pl-10"
               />
-              <Search className="absolute left-3 top-[38px] text-textMuted group-focus-within:text-primary transition-colors" size={18} />
+              <Search
+                className="absolute left-3 top-[38px] text-textMuted group-focus-within:text-primary transition-colors"
+                size={18}
+              />
 
               {patientResults.length > 0 && (
                 <div className="absolute z-20 w-full mt-2 bg-surface border border-border rounded-2xl shadow-2xl max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
@@ -281,10 +317,17 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
                       onClick={() => handleSelectPatient(p)}
                     >
                       <div>
-                        <p className="font-bold text-text group-hover:text-primary transition-colors">{p.fullname}</p>
-                        <p className="text-xs text-textMuted">ID: {p.patientnumber}</p>
+                        <p className="font-bold text-text group-hover:text-primary transition-colors">
+                          {p.fullname}
+                        </p>
+                        <p className="text-xs text-textMuted">
+                          ID: {p.patientnumber}
+                        </p>
                       </div>
-                      <ChevronRight size={16} className="text-textMuted group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight
+                        size={16}
+                        className="text-textMuted group-hover:translate-x-1 transition-transform"
+                      />
                     </button>
                   ))}
                 </div>
@@ -297,7 +340,9 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
                   label="Date"
                   type="date"
                   value={formData.date}
-                  onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, date: e.target.value }))
+                  }
                 />
               </div>
               <div className="relative group">
@@ -305,7 +350,9 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
                   label="Time"
                   type="time"
                   value={formData.time}
-                  onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, time: e.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -313,10 +360,15 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
             <Select
               label="Department / Specialty"
               value={formData.specialization}
-              onChange={(e: any) => setFormData(prev => ({ ...prev, specialization: e.target.value }))}
+              onChange={(e: any) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  specialization: e.target.value,
+                }))
+              }
               options={[
                 { value: "", label: "Select Clinical Specialty" },
-                ...SPECIALIZATIONS
+                ...SPECIALIZATIONS,
               ]}
             />
           </div>
@@ -328,17 +380,29 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
                   <Activity size={18} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-primary uppercase tracking-widest">Active Filters</p>
-                  <p className="text-sm font-bold text-text">{formData.specialization}</p>
+                  <p className="text-xs font-bold text-primary uppercase tracking-widest">
+                    Active Filters
+                  </p>
+                  <p className="text-sm font-bold text-text">
+                    {formData.specialization}
+                  </p>
                 </div>
               </div>
-              <Badge variant="info" className="px-3">{new Date(formData.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} at {formData.time}</Badge>
+              <Badge variant="info" className="px-3">
+                {new Date(formData.date).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                })}{" "}
+                at {formData.time}
+              </Badge>
             </div>
 
             {isLoadingDoctors ? (
               <div className="py-16 flex flex-col items-center justify-center gap-4">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                <p className="text-sm text-textMuted font-medium italic">Querying specialist availability...</p>
+                <p className="text-sm text-textMuted font-medium italic">
+                  Querying specialist availability...
+                </p>
               </div>
             ) : doctors.length > 0 ? (
               <div className="grid gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
@@ -346,31 +410,46 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
                   <button
                     key={doctor.doctorid}
                     disabled={doctor.is_busy}
-                    onClick={() => setFormData(prev => ({ ...prev, doctorid: doctor.doctorid, doctorName: doctor.fullname }))}
-                    className={`w-full p-4 rounded-2xl border text-left transition-all flex items-center justify-between group relative overflow-hidden ${doctor.is_busy
-                      ? "bg-border/5 border-border opacity-50 grayscale cursor-not-allowed"
-                      : formData.doctorid === doctor.doctorid
-                        ? "border-primary bg-primary/5 ring-2 ring-primary shadow-lg shadow-primary/10"
-                        : "border-border hover:border-primary/50 hover:bg-surface/80"
-                      }`}
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        doctorid: doctor.doctorid,
+                        doctorName: doctor.fullname,
+                      }))
+                    }
+                    className={`w-full p-4 rounded-2xl border text-left transition-all flex items-center justify-between group relative overflow-hidden ${
+                      doctor.is_busy
+                        ? "bg-border/5 border-border opacity-50 grayscale cursor-not-allowed"
+                        : formData.doctorid === doctor.doctorid
+                          ? "border-primary bg-primary/5 ring-2 ring-primary shadow-lg shadow-primary/10"
+                          : "border-border hover:border-primary/50 hover:bg-surface/80"
+                    }`}
                   >
                     <div className="flex items-center gap-4 relative z-10">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg transition-all ${formData.doctorid === doctor.doctorid ? "bg-primary text-white shadow-lg shadow-primary/30" : "bg-primary/10 text-primary"}`}>
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg transition-all ${formData.doctorid === doctor.doctorid ? "bg-primary text-white shadow-lg shadow-primary/30" : "bg-primary/10 text-primary"}`}
+                      >
                         {doctor.fullname.charAt(0)}
                       </div>
                       <div>
                         <p className="font-bold text-text">{doctor.fullname}</p>
-                        <p className="text-xs text-textMuted font-medium">{doctor.specialization}</p>
+                        <p className="text-xs text-textMuted font-medium">
+                          {doctor.specialization}
+                        </p>
                       </div>
                     </div>
                     <div className="relative z-10">
                       {doctor.is_busy ? (
                         <div className="flex items-center gap-1.5 text-error">
                           <AlertCircle size={14} />
-                          <span className="text-[10px] font-black uppercase">Conflict</span>
+                          <span className="text-[10px] font-black uppercase">
+                            Conflict
+                          </span>
                         </div>
                       ) : (
-                        <Badge variant="success" className="px-3 rounded-md">Available</Badge>
+                        <Badge variant="success" className="px-3 rounded-md">
+                          Available
+                        </Badge>
                       )}
                     </div>
                   </button>
@@ -378,10 +457,22 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
               </div>
             ) : (
               <div className="py-16 text-center border-2 border-dashed border-border rounded-3xl bg-border/5">
-                <AlertCircle size={40} className="mx-auto text-textMuted mb-3 opacity-20" />
-                <h4 className="text-lg font-bold text-text">No Specialists Found</h4>
-                <p className="text-sm text-textMuted max-w-xs mx-auto mt-1 mb-6">We couldn't find any available doctors in this specialty for the selected time.</p>
-                <Button variant="outline" size="sm" onClick={() => setCurrentStep(1)}>
+                <AlertCircle
+                  size={40}
+                  className="mx-auto text-textMuted mb-3 opacity-20"
+                />
+                <h4 className="text-lg font-bold text-text">
+                  No Specialists Found
+                </h4>
+                <p className="text-sm text-textMuted max-w-xs mx-auto mt-1 mb-6">
+                  We couldn't find any available doctors in this specialty for
+                  the selected time.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentStep(1)}
+                >
                   Modify Search Criteria
                 </Button>
               </div>

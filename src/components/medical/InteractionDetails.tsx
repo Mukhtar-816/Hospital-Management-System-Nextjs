@@ -15,7 +15,11 @@ interface InteractionData {
   }[];
 }
 
-export function InteractionDetails({ appointmentId }: { appointmentId: string }) {
+export function InteractionDetails({
+  appointmentId,
+}: {
+  appointmentId: string;
+}) {
   const [data, setData] = React.useState<InteractionData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -23,7 +27,9 @@ export function InteractionDetails({ appointmentId }: { appointmentId: string })
   React.useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch(`/api/appointments/${appointmentId}/interaction`);
+        const res = await fetch(
+          `/api/appointments/${appointmentId}/interaction`,
+        );
         const json = await res.json();
         if (json.success) {
           setData(json.interaction);
@@ -71,7 +77,10 @@ export function InteractionDetails({ appointmentId }: { appointmentId: string })
           <div className="space-y-2">
             {data.diagnoses && data.diagnoses.length > 0 ? (
               data.diagnoses.map((d, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-bg border border-border">
+                <div
+                  key={i}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-bg border border-border"
+                >
                   <div className="w-2 h-2 rounded-full bg-primary" />
                   <span className="text-text font-medium">{d.description}</span>
                 </div>
@@ -85,19 +94,28 @@ export function InteractionDetails({ appointmentId }: { appointmentId: string })
 
       <div className="space-y-6">
         <Card title="Prescriptions">
-          <Table headers={["Medicine", "Frequency", "Duration", "Instructions"]}>
+          <Table
+            headers={["Medicine", "Frequency", "Duration", "Instructions"]}
+          >
             {data.prescriptions && data.prescriptions.length > 0 ? (
               data.prescriptions.map((p, i) => (
                 <TableRow key={i}>
-                  <TableCell className="font-bold text-primary">{p.medicine}</TableCell>
+                  <TableCell className="font-bold text-primary">
+                    {p.medicine}
+                  </TableCell>
                   <TableCell>{p.frequency}</TableCell>
                   <TableCell>{p.duration}</TableCell>
-                  <TableCell className="text-textMuted italic">{p.instructions || "None"}</TableCell>
+                  <TableCell className="text-textMuted italic">
+                    {p.instructions || "None"}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-6 text-textMuted">
+                <TableCell
+                  colSpan={4}
+                  className="text-center py-6 text-textMuted"
+                >
                   No prescriptions given for this visit.
                 </TableCell>
               </TableRow>

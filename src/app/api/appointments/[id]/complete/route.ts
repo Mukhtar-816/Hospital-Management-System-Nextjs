@@ -1,12 +1,15 @@
-import { devLog, devError } from "@/lib/logger";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
-import { getUserRoleAndPermissions, requirePermission } from "@/lib/auth/permission";
+import {
+  getUserRoleAndPermissions,
+  requirePermission,
+} from "@/lib/auth/permission";
+import { devError, devLog } from "@/lib/logger";
 import * as appointmentService from "@/lib/services/appointment/appointment.service";
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -22,7 +25,7 @@ export async function PATCH(
     devError("COMPLETE APPOINTMENT ERROR:", err);
     return NextResponse.json(
       { error: err.message || "Failed to complete appointment" },
-      { status: err.message.includes("Invalid transition") ? 400 : 500 }
+      { status: err.message.includes("Invalid transition") ? 400 : 500 },
     );
   }
 }

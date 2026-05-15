@@ -55,7 +55,9 @@ export default function NewRequest() {
             placeholder="Please describe your symptoms in detail..."
             required
             value={formData.symptoms}
-            onChange={(e) => setFormData({ ...formData, symptoms: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, symptoms: e.target.value })
+            }
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -64,12 +66,16 @@ export default function NewRequest() {
               type="datetime-local"
               required
               value={formData.preferredtime}
-              onChange={(e) => setFormData({ ...formData, preferredtime: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, preferredtime: e.target.value })
+              }
             />
             <Select
               label="Priority Level"
               value={formData.priority}
-              onChange={(e: any) => setFormData({ ...formData, priority: e.target.value })}
+              onChange={(e: any) =>
+                setFormData({ ...formData, priority: e.target.value })
+              }
               options={[
                 { value: "low", label: "Low - Routine" },
                 { value: "medium", label: "Medium - Urgent" },
@@ -82,9 +88,7 @@ export default function NewRequest() {
             <Button variant="secondary" onClick={() => router.back()}>
               Cancel
             </Button>
-            <Button type="submit">
-              Submit Request
-            </Button>
+            <Button type="submit">Submit Request</Button>
           </div>
         </form>
       </Card>

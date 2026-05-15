@@ -1,3 +1,4 @@
+import { type NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import {
   getUserRoleAndPermissions,
@@ -5,7 +6,7 @@ import {
 } from "@/lib/auth/permission";
 import { pool } from "@/lib/db";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const decoded = getUser(req) as { userid: string };
     const access = await getUserRoleAndPermissions(decoded.userid);
@@ -16,19 +17,22 @@ export async function GET(req: Request) {
 
     const result = await pool.query("SELECT * FROM role");
 
-    return Response.json({ role: result.rows });
+    return NextResponse.json({ role: result.rows });
   } catch (err: any) {
     if (err?.message === "Unauthorized") {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     if (err?.message === "Forbidden") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const decoded = getUser(req) as { userid: string };
     const access = await getUserRoleAndPermissions(decoded.userid);
@@ -42,14 +46,17 @@ export async function POST(req: Request) {
 
     await pool.query("INSERT INTO role (name) VALUES ($1)", [name]);
 
-    return Response.json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (err: any) {
     if (err?.message === "Unauthorized") {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     if (err?.message === "Forbidden") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

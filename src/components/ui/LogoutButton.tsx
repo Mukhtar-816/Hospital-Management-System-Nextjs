@@ -1,8 +1,9 @@
-"use client"; import { devLog, devError } from "@/lib/logger";
+"use client";
+import { Loader2, LogOut } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 import React from "react";
-import { LogOut, Loader2 } from "lucide-react";
+import { devError, devLog } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
 interface LogoutButtonProps {
@@ -10,7 +11,10 @@ interface LogoutButtonProps {
   showLabel?: boolean;
 }
 
-export const LogoutButton = ({ className, showLabel = true }: LogoutButtonProps) => {
+export const LogoutButton = ({
+  className,
+  showLabel = true,
+}: LogoutButtonProps) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -39,7 +43,7 @@ export const LogoutButton = ({ className, showLabel = true }: LogoutButtonProps)
       className={cn(
         "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-textMuted hover:bg-error/10 hover:text-error w-full font-semibold",
         !showLabel && "justify-center px-0",
-        className
+        className,
       )}
       title="Logout"
     >
@@ -56,4 +60,3 @@ export const LogoutButton = ({ className, showLabel = true }: LogoutButtonProps)
     </button>
   );
 };
-

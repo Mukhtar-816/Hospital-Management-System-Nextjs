@@ -29,7 +29,7 @@ export const Table = ({ children, headers, className = "" }: TableProps) => {
     <div
       className={cn(
         "w-full overflow-x-auto rounded-2xl border border-border/50 bg-surface/30 backdrop-blur-sm custom-scrollbar",
-        className
+        className,
       )}
     >
       <table className="w-full text-left border-collapse">
@@ -49,27 +49,36 @@ export const TableRow = ({
   className?: string;
   onClick?: () => void;
 }) => (
-  <tr 
+  <tr
     onClick={onClick}
     className={cn(
       "group hover:bg-primary/[0.02] transition-colors cursor-default",
       onClick && "cursor-pointer",
-      className
+      className,
     )}
   >
     {children}
   </tr>
 );
 
+export interface TableCellProps
+  extends React.TdHTMLAttributes<HTMLTableCellElement> {
+  children: React.ReactNode;
+  className?: string;
+}
+
 export const TableCell = ({
   children,
   className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <td className={cn("px-6 py-5 text-sm font-medium text-text whitespace-nowrap transition-colors group-hover:text-primary", className)}>
+  ...props
+}: TableCellProps) => (
+  <td
+    className={cn(
+      "px-6 py-5 text-sm font-medium text-text whitespace-nowrap transition-colors group-hover:text-primary",
+      className,
+    )}
+    {...props}
+  >
     {children}
   </td>
 );
-

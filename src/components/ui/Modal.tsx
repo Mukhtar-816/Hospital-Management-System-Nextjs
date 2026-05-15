@@ -8,6 +8,7 @@ interface ModalProps {
   children: React.ReactNode;
   footer?: React.ReactNode;
   maxWidth?: string;
+  className?: string;
 }
 
 export const Modal = ({
@@ -17,6 +18,7 @@ export const Modal = ({
   children,
   footer,
   maxWidth,
+  className,
 }: ModalProps) => {
   if (!isOpen) return null;
 
@@ -29,7 +31,9 @@ export const Modal = ({
         onKeyUp={(e) => e.key === "Escape" && onClose()}
         aria-label="Close modal"
       />
-      <div className={`relative ${maxWidth ? `${maxWidth}` : "max-w-7xl"} bg-surface border border-border rounded-2xl w-full  shadow-2xl animate-in zoom-in-95 duration-200`}>
+      <div
+        className={`relative ${maxWidth ? `${maxWidth}` : "max-w-7xl"} bg-surface border border-border rounded-2xl w-full  shadow-2xl animate-in zoom-in-95 duration-200`}
+      >
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-xl font-semibold text-text">{title}</h2>
           <button

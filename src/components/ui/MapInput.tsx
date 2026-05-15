@@ -1,14 +1,26 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
+import React, { useEffect, useState } from "react";
+import {
+  MapContainer,
+  Marker,
+  TileLayer,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Search, MapPin, Loader2, Navigation, CheckCircle2 } from "lucide-react";
-import { Input } from "./Forms";
+import {
+  CheckCircle2,
+  Loader2,
+  MapPin,
+  Navigation,
+  Search,
+} from "lucide-react";
+import { devError, devLog } from "@/lib/logger";
 import { Button } from "./Button";
+import { Input } from "./Forms";
 import { Modal } from "./Modal";
-import { devLog, devError } from "@/lib/logger";
 
 // Fix Leaflet default icon issues in Next.js
 if (typeof window !== "undefined") {
@@ -21,7 +33,6 @@ if (typeof window !== "undefined") {
   L.Marker.prototype.options.icon = DefaultIcon;
 }
 
-
 interface MapInputProps {
   onLocationChange: (lat: number, lng: number) => void;
   initialLocation?: [number, number];
@@ -29,12 +40,12 @@ interface MapInputProps {
   compact?: boolean;
 }
 
-function LocationMarker({ 
-  position, 
-  setPosition 
-}: { 
-  position: [number, number] | null, 
-  setPosition: (pos: [number, number]) => void 
+function LocationMarker({
+  position,
+  setPosition,
+}: {
+  position: [number, number] | null;
+  setPosition: (pos: [number, number]) => void;
 }) {
   const map = useMapEvents({
     click(e) {
@@ -44,9 +55,7 @@ function LocationMarker({
     },
   });
 
-  return position === null ? null : (
-    <Marker position={position} />
-  );
+  return position === null ? null : <Marker position={position} />;
 }
 
 function ChangeView({ center }: { center: [number, number] }) {
@@ -57,9 +66,16 @@ function ChangeView({ center }: { center: [number, number] }) {
   return null;
 }
 
-export const MapInput = ({ onLocationChange, initialLocation, label, compact = false }: MapInputProps) => {
+export const MapInput = ({
+  onLocationChange,
+  initialLocation,
+  label,
+  compact = false,
+}: MapInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState<[number, number] | null>(initialLocation || null);
+  const [position, setPosition] = useState<[number, number] | null>(
+    initialLocation || null,
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -79,7 +95,9 @@ export const MapInput = ({ onLocationChange, initialLocation, label, compact = f
     if (!searchQuery.trim()) return;
     setIsSearching(true);
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`,
+      );
       const data = await res.json();
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
@@ -103,10 +121,14 @@ export const MapInput = ({ onLocationChange, initialLocation, label, compact = f
 
   return (
     <div className="space-y-1.5">
-      {label && <label className="text-[9px] font-black text-textMuted uppercase tracking-[0.15em] ml-1">{label}</label>}
-      
+      {label && (
+        <label className="text-[9px] font-black text-textMuted uppercase tracking-[0.15em] ml-1">
+          {label}
+        </label>
+      )}
+
       <div className="flex items-center gap-2">
-        <Button 
+        <Button
           type="button"
           variant={position ? "secondary" : "primary"}
           onClick={() => setIsOpen(true)}
@@ -119,7 +141,10 @@ export const MapInput = ({ onLocationChange, initialLocation, label, compact = f
             </>
           ) : (
             <>
-              <Navigation size={14} className="group-hover:translate-x-0.5 transition-transform" />
+              <Navigation
+                size={14}
+                className="group-hover:translate-x-0.5 transition-transform"
+              />
               Pin Location
             </>
           )}
@@ -128,12 +153,20 @@ export const MapInput = ({ onLocationChange, initialLocation, label, compact = f
         {position && (
           <div className="flex gap-1.5">
             <div className="px-2.5 py-1.5 bg-surface/50 border border-border/50 rounded-lg text-center min-w-[70px]">
-              <p className="text-[7px] font-black text-textMuted uppercase leading-none mb-0.5">Lat</p>
-              <p className="text-[9px] font-bold text-text tabular-nums">{position[0].toFixed(3)}</p>
+              <p className="text-[7px] font-black text-textMuted uppercase leading-none mb-0.5">
+                Lat
+              </p>
+              <p className="text-[9px] font-bold text-text tabular-nums">
+                {position[0].toFixed(3)}
+              </p>
             </div>
             <div className="px-2.5 py-1.5 bg-surface/50 border border-border/50 rounded-lg text-center min-w-[70px]">
-              <p className="text-[7px] font-black text-textMuted uppercase leading-none mb-0.5">Lng</p>
-              <p className="text-[9px] font-bold text-text tabular-nums">{position[1].toFixed(3)}</p>
+              <p className="text-[7px] font-black text-textMuted uppercase leading-none mb-0.5">
+                Lng
+              </p>
+              <p className="text-[9px] font-bold text-text tabular-nums">
+                {position[1].toFixed(3)}
+              </p>
             </div>
           </div>
         )}
@@ -147,48 +180,77 @@ export const MapInput = ({ onLocationChange, initialLocation, label, compact = f
       >
         <div className="space-y-3 py-1">
           <div className="flex gap-2">
-            <Input 
-              placeholder="Search address..." 
+            <Input
+              placeholder="Search address..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="flex-1 h-10 text-sm"
             />
-            <Button onClick={handleSearch} disabled={isSearching} className="shrink-0 px-4 h-10">
-              {isSearching ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+            <Button
+              onClick={handleSearch}
+              disabled={isSearching}
+              className="shrink-0 px-4 h-10"
+            >
+              {isSearching ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Search size={14} />
+              )}
             </Button>
           </div>
-          
+
           <div className="h-[400px] w-full rounded-2xl overflow-hidden border border-border shadow-inner relative group z-0">
-            <MapContainer 
-              center={position || [24.8607, 67.0011]} 
-              zoom={position ? 15 : 13} 
+            <MapContainer
+              center={position || [24.8607, 67.0011]}
+              zoom={position ? 15 : 13}
               style={{ height: "100%", width: "100%" }}
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              <LocationMarker position={position} setPosition={updatePosition} />
+              <LocationMarker
+                position={position}
+                setPosition={updatePosition}
+              />
               {position && <ChangeView center={position} />}
             </MapContainer>
-            
+
             <div className="absolute bottom-4 left-4 z-[1000] glass px-3 py-1.5 rounded-lg border border-white/10 shadow-2xl pointer-events-none">
-              <p className="text-[8px] font-black text-white uppercase tracking-widest">Guide</p>
-              <p className="text-[9px] text-white/80 font-medium italic">Click map to drop pin</p>
+              <p className="text-[8px] font-black text-white uppercase tracking-widest">
+                Guide
+              </p>
+              <p className="text-[9px] text-white/80 font-medium italic">
+                Click map to drop pin
+              </p>
             </div>
           </div>
 
           <div className="flex justify-between items-center pt-1">
             <div className="flex gap-4">
-               {position && (
-                 <div className="flex gap-3 text-[10px] font-bold text-textMuted uppercase tracking-tight">
-                   <span>LAT: <span className="text-text tabular-nums">{position[0].toFixed(6)}</span></span>
-                   <span>LNG: <span className="text-text tabular-nums">{position[1].toFixed(6)}</span></span>
-                 </div>
-               )}
+              {position && (
+                <div className="flex gap-3 text-[10px] font-bold text-textMuted uppercase tracking-tight">
+                  <span>
+                    LAT:{" "}
+                    <span className="text-text tabular-nums">
+                      {position[0].toFixed(6)}
+                    </span>
+                  </span>
+                  <span>
+                    LNG:{" "}
+                    <span className="text-text tabular-nums">
+                      {position[1].toFixed(6)}
+                    </span>
+                  </span>
+                </div>
+              )}
             </div>
-            <Button onClick={() => setIsOpen(false)} variant="primary" className="px-8 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/20">
+            <Button
+              onClick={() => setIsOpen(false)}
+              variant="primary"
+              className="px-8 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/20"
+            >
               Set Coordinates
             </Button>
           </div>
@@ -197,6 +259,3 @@ export const MapInput = ({ onLocationChange, initialLocation, label, compact = f
     </div>
   );
 };
-
-
-

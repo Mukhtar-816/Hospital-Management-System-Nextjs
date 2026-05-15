@@ -3,7 +3,14 @@ import { cn } from "@/lib/utils";
 
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: "success" | "pending" | "rejected" | "info" | "warning" | "error" | "outline";
+  variant?:
+    | "success"
+    | "pending"
+    | "rejected"
+    | "info"
+    | "warning"
+    | "error"
+    | "outline";
   className?: string;
   dot?: boolean;
 }
@@ -29,16 +36,22 @@ export const Badge = ({
       className={cn(
         "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border transition-colors",
         variants[variant],
-        className
+        className,
       )}
     >
       {dot && (
-        <span className={cn(
-          "mr-1.5 h-1.5 w-1.5 rounded-full",
-          variant === "success" ? "bg-success animate-pulse" : 
-          variant === "warning" || variant === "pending" ? "bg-warning" :
-          variant === "error" || variant === "rejected" ? "bg-error" : "bg-primary"
-        )} />
+        <span
+          className={cn(
+            "mr-1.5 h-1.5 w-1.5 rounded-full",
+            variant === "success"
+              ? "bg-success animate-pulse"
+              : variant === "warning" || variant === "pending"
+                ? "bg-warning"
+                : variant === "error" || variant === "rejected"
+                  ? "bg-error"
+                  : "bg-primary",
+          )}
+        />
       )}
       {children}
     </span>
@@ -51,9 +64,11 @@ export const Skeleton = ({
 }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
-      className={cn("animate-pulse rounded-2xl bg-border/20 backdrop-blur-sm", className)}
+      className={cn(
+        "animate-pulse rounded-2xl bg-border/20 backdrop-blur-sm",
+        className,
+      )}
       {...props}
     />
   );
 };
-

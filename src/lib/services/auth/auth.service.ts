@@ -18,11 +18,10 @@ export async function register(data: any) {
 
   await userService.assignRole(user.userid, "patient");
 
-  await patientService.createPatient(user.userid, { 
+  await patientService.createPatient(user.userid, {
     fullname,
-    location: data.location || null
+    location: data.location || null,
   });
-
 
   return { message: "Registered successfully" };
 }

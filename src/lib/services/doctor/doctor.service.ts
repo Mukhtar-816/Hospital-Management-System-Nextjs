@@ -1,7 +1,12 @@
+import type { PoolClient } from "pg";
 import { pool } from "@/lib/db";
-import { PoolClient } from "pg";
 
-export async function createDoctor(userid: string, fullname: string, specialization: string, client?: PoolClient) {
+export async function createDoctor(
+  userid: string,
+  fullname: string,
+  specialization: string,
+  client?: PoolClient,
+) {
   const db = client || pool;
   const result = await db.query(
     `INSERT INTO doctor (userid, fullname, specialization)
@@ -13,7 +18,11 @@ export async function createDoctor(userid: string, fullname: string, specializat
   return result.rows[0];
 }
 
-export async function updateDoctor(userid: string, fullname: string, specialization: string) {
+export async function updateDoctor(
+  userid: string,
+  fullname: string,
+  specialization: string,
+) {
   const result = await pool.query(
     `UPDATE doctor
      SET fullname = $1, specialization = $2
@@ -26,14 +35,12 @@ export async function updateDoctor(userid: string, fullname: string, specializat
 }
 
 export async function getDoctorByUserId(userid: string) {
-  const result = await pool.query(
-    `SELECT * FROM doctor WHERE userid = $1`,
-    [userid],
-  );
+  const result = await pool.query(`SELECT * FROM doctor WHERE userid = $1`, [
+    userid,
+  ]);
 
   return result.rows[0];
 }
-
 
 export async function searchDoctorsForAppointment(filters: {
   specialization?: string;
@@ -68,6 +75,8 @@ export async function searchDoctorsForAppointment(filters: {
 }
 
 export async function getAllDoctors() {
-  const result = await pool.query(`SELECT doctorid, fullname, specialization FROM doctor`);
+  const result = await pool.query(
+    `SELECT doctorid, fullname, specialization FROM doctor`,
+  );
   return result.rows;
 }

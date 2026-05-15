@@ -1,19 +1,25 @@
 "use client";
 
+import { Hash, MapPin, Save, User } from "lucide-react";
+import dynamic from "next/dynamic";
 import { showToast } from "nextjs-toast-notify";
 import { useCallback, useEffect, useState } from "react";
 import { ProfileTemplate } from "@/components/modules/ProfileTemplate";
+import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Forms";
 import { useLoading } from "@/lib/LoadingContext";
-import { Button } from "@/components/ui/Button";
-import { Save, User, MapPin, Hash } from "lucide-react";
-import dynamic from "next/dynamic";
 
-const MapInput = dynamic(() => import("@/components/ui/MapInput").then(mod => mod.MapInput), { 
-  ssr: false,
-  loading: () => <div className="h-10 w-full bg-surface/50 border border-border rounded-xl animate-pulse flex items-center justify-center text-[10px] font-black text-textMuted uppercase">Loading Map Module...</div>
-});
-
+const MapInput = dynamic(
+  () => import("@/components/ui/MapInput").then((mod) => mod.MapInput),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-10 w-full bg-surface/50 border border-border rounded-xl animate-pulse flex items-center justify-center text-[10px] font-black text-textMuted uppercase">
+        Loading Map Module...
+      </div>
+    ),
+  },
+);
 
 export default function PatientProfile() {
   const { showLoading, hideLoading } = useLoading();
@@ -25,7 +31,10 @@ export default function PatientProfile() {
     try {
       const res = await fetch("/api/patient/me");
       if (!res.ok) {
-        if (typeof document !== 'undefined') document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+        if (typeof document !== "undefined")
+          document
+            .querySelectorAll(".toast-nextjs, .toast-container")
+            .forEach((el) => el.remove());
         showToast.error("Security retrieval failure.");
         return;
       }
@@ -33,7 +42,10 @@ export default function PatientProfile() {
       setUserData(data);
       setFormData(data);
     } catch {
-      if (typeof document !== 'undefined') document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+      if (typeof document !== "undefined")
+        document
+          .querySelectorAll(".toast-nextjs, .toast-container")
+          .forEach((el) => el.remove());
       showToast.error("Connection synchronization error.");
     } finally {
       hideLoading();
@@ -59,16 +71,25 @@ export default function PatientProfile() {
       });
 
       if (!res.ok) {
-        if (typeof document !== 'undefined') document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+        if (typeof document !== "undefined")
+          document
+            .querySelectorAll(".toast-nextjs, .toast-container")
+            .forEach((el) => el.remove());
         showToast.error("Update protocol rejected by server.");
         return;
       }
 
-      if (typeof document !== 'undefined') document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+      if (typeof document !== "undefined")
+        document
+          .querySelectorAll(".toast-nextjs, .toast-container")
+          .forEach((el) => el.remove());
       showToast.success("Identity profile successfully committed.");
       getUserProfile();
     } catch (err: any) {
-      if (typeof document !== 'undefined') document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+      if (typeof document !== "undefined")
+        document
+          .querySelectorAll(".toast-nextjs, .toast-container")
+          .forEach((el) => el.remove());
       showToast.error(err.message);
     } finally {
       hideLoading();
@@ -78,7 +99,11 @@ export default function PatientProfile() {
   const onLocationChange = useCallback((lat: number, lng: number) => {
     setFormData((prev: any) => {
       if (!prev) return prev;
-      if (prev.location && prev.location[0] === lat && prev.location[1] === lng) {
+      if (
+        prev.location &&
+        prev.location[0] === lat &&
+        prev.location[1] === lng
+      ) {
         return prev;
       }
       return { ...prev, location: [lat, lng] };
@@ -103,17 +128,25 @@ export default function PatientProfile() {
             }
             className="pl-10"
           />
-          <Hash className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors" size={18} />
+          <Hash
+            className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors"
+            size={18}
+          />
         </div>
-        
+
         <div className="relative group">
           <Input
             label="Legal Full Name"
             value={formData.fullname || ""}
-            onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, fullname: e.target.value })
+            }
             className="pl-10"
           />
-          <User className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors" size={18} />
+          <User
+            className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors"
+            size={18}
+          />
         </div>
 
         <div className="md:col-span-2 relative group">
@@ -125,7 +158,10 @@ export default function PatientProfile() {
             }
             className="pl-10"
           />
-          <MapPin className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors" size={18} />
+          <MapPin
+            className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors"
+            size={18}
+          />
         </div>
 
         <div className="relative group">
@@ -144,11 +180,11 @@ export default function PatientProfile() {
         </div>
 
         <div className="relative">
-           <MapInput 
-             label="Precise Geospatial Location"
-             onLocationChange={onLocationChange}
-             initialLocation={formData.location}
-           />
+          <MapInput
+            label="Precise Geospatial Location"
+            onLocationChange={onLocationChange}
+            initialLocation={formData.location}
+          />
         </div>
       </div>
 

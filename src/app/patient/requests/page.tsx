@@ -1,6 +1,5 @@
 "use client";
 
-import { devLog, devError } from "@/lib/logger";
 import Link from "next/link";
 import React from "react";
 import { Badge } from "@/components/ui/Badge";
@@ -8,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Table, TableCell, TableRow } from "@/components/ui/Table";
 import { useLoading } from "@/lib/LoadingContext";
+import { devError, devLog } from "@/lib/logger";
 
 export default function PatientRequests() {
   const { showLoading, hideLoading } = useLoading();
@@ -47,37 +47,50 @@ export default function PatientRequests() {
       </div>
 
       <Card>
-        <Table
-          headers={["Priority", "Symptoms", "Preferred Time", "Status"]}
-        >
-          {requests.length > 0 ? requests.map((req) => (
-            <TableRow key={req.requestid}>
-              <TableCell>
-                <Badge
-                  variant={
-                    req.priority === "high" ? "error" :
-                      req.priority === "medium" ? "warning" : "info"
-                  }
-                >
-                  {req.priority}
-                </Badge>
-              </TableCell>
-              <TableCell className="max-w-xs truncate">{req.symptoms}</TableCell>
-              <TableCell>{new Date(req.preferredtime).toLocaleString()}</TableCell>
-              <TableCell>
-                <Badge
-                  variant={
-                    req.status === "pending" ? "warning" :
-                      req.status === "approved" ? "success" : "error"
-                  }
-                >
-                  {req.status}
-                </Badge>
-              </TableCell>
-            </TableRow>
-          )) : (
+        <Table headers={["Priority", "Symptoms", "Preferred Time", "Status"]}>
+          {requests.length > 0 ? (
+            requests.map((req) => (
+              <TableRow key={req.requestid}>
+                <TableCell>
+                  <Badge
+                    variant={
+                      req.priority === "high"
+                        ? "error"
+                        : req.priority === "medium"
+                          ? "warning"
+                          : "info"
+                    }
+                  >
+                    {req.priority}
+                  </Badge>
+                </TableCell>
+                <TableCell className="max-w-xs truncate">
+                  {req.symptoms}
+                </TableCell>
+                <TableCell>
+                  {new Date(req.preferredtime).toLocaleString()}
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      req.status === "pending"
+                        ? "warning"
+                        : req.status === "approved"
+                          ? "success"
+                          : "error"
+                    }
+                  >
+                    {req.status}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-8 text-textMuted">
+              <TableCell
+                colSpan={4}
+                className="text-center py-8 text-textMuted"
+              >
                 No requests found
               </TableCell>
             </TableRow>

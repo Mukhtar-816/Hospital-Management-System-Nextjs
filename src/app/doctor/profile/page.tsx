@@ -1,13 +1,13 @@
-"use client"; import { devLog, devError } from "@/lib/logger";
-
+"use client";
+import { AlertCircle, Briefcase, CheckCircle2, Save, User } from "lucide-react";
+import { showToast } from "nextjs-toast-notify";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { ProfileTemplate } from "@/components/modules/ProfileTemplate";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Forms";
 import { useLoading } from "@/lib/LoadingContext";
-import { Save, User, Briefcase, CheckCircle2, AlertCircle } from "lucide-react";
-import { showToast } from "nextjs-toast-notify";
+import { devError, devLog } from "@/lib/logger";
 
 export default function DoctorProfile() {
   const { showLoading, hideLoading } = useLoading();
@@ -32,10 +32,11 @@ export default function DoctorProfile() {
       try {
         const [userRes, doctorRes] = await Promise.all([
           fetch("/api/users/me"),
-          fetch("/api/doctor/me")
+          fetch("/api/doctor/me"),
         ]);
 
-        if (!userRes.ok || !doctorRes.ok) throw new Error("Synchronization failure.");
+        if (!userRes.ok || !doctorRes.ok)
+          throw new Error("Synchronization failure.");
 
         const userData = await userRes.json();
         const doctorData = await doctorRes.json();
@@ -86,14 +87,18 @@ export default function DoctorProfile() {
       if (!res.ok) throw new Error("Commit protocol rejected.");
       setSuccess("Profile information updated.");
 
-      if (typeof document !== 'undefined') {
-        document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+      if (typeof document !== "undefined") {
+        document
+          .querySelectorAll(".toast-nextjs, .toast-container")
+          .forEach((el) => el.remove());
       }
       showToast.success("Profile records updated.");
     } catch (err: any) {
       setError(err.message);
-      if (typeof document !== 'undefined') {
-        document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+      if (typeof document !== "undefined") {
+        document
+          .querySelectorAll(".toast-nextjs, .toast-container")
+          .forEach((el) => el.remove());
       }
       showToast.error(err.message);
     } finally {
@@ -104,7 +109,9 @@ export default function DoctorProfile() {
   const details = (
     <div className="space-y-6">
       {(error || success) && (
-        <div className={`p-4 rounded-xl border flex items-center gap-3 animate-in slide-in-from-top-1 ${error ? "bg-error/10 border-error/20 text-error" : "bg-success/10 border-success/20 text-success"}`}>
+        <div
+          className={`p-4 rounded-xl border flex items-center gap-3 animate-in slide-in-from-top-1 ${error ? "bg-error/10 border-error/20 text-error" : "bg-success/10 border-success/20 text-success"}`}
+        >
           {error ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
           <p className="text-sm font-medium">{error || success}</p>
         </div>
@@ -119,7 +126,10 @@ export default function DoctorProfile() {
             onChange={handleChange}
             className="pl-10"
           />
-          <User className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors" size={18} />
+          <User
+            className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors"
+            size={18}
+          />
         </div>
         <div className="relative group">
           <Input
@@ -129,7 +139,10 @@ export default function DoctorProfile() {
             onChange={handleChange}
             className="pl-10"
           />
-          <Briefcase className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors" size={18} />
+          <Briefcase
+            className="absolute left-3 top-10 text-textMuted group-focus-within:text-primary transition-colors"
+            size={18}
+          />
         </div>
       </div>
 

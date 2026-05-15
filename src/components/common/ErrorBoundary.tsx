@@ -1,6 +1,6 @@
-"use client"; import { devLog, devError } from "@/lib/logger";
-
+"use client";
 import React from "react";
+import { devError, devLog } from "@/lib/logger";
 import { Button } from "../ui/Button";
 
 interface Props {
@@ -41,11 +41,10 @@ export class ErrorBoundary extends React.Component<Props, State> {
           <div className="text-4xl">⚠️</div>
           <h2 className="text-xl font-bold text-text">Something went wrong</h2>
           <p className="text-textMuted max-w-md mx-auto">
-            The application encountered an unexpected error. Please try refreshing the page.
+            The application encountered an unexpected error. Please try
+            refreshing the page.
           </p>
-          <Button onClick={() => window.location.reload()}>
-            Refresh Page
-          </Button>
+          <Button onClick={() => window.location.reload()}>Refresh Page</Button>
         </div>
       );
     }

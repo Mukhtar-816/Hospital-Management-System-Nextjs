@@ -28,7 +28,7 @@ export const isNotEmpty = (value: string | undefined | null) => {
 export const validateRequired = (fields: Record<string, any>) => {
   const missing = [];
   for (const [key, value] of Object.entries(fields)) {
-    if (typeof value === 'string' && !isNotEmpty(value)) {
+    if (typeof value === "string" && !isNotEmpty(value)) {
       missing.push(key);
     } else if (value === undefined || value === null) {
       missing.push(key);
@@ -36,7 +36,7 @@ export const validateRequired = (fields: Record<string, any>) => {
   }
   return {
     isValid: missing.length === 0,
-    missingFields: missing
+    missingFields: missing,
   };
 };
 

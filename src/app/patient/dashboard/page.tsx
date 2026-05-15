@@ -1,18 +1,19 @@
 "use client";
 
+import {
+  Activity,
+  Calendar,
+  CalendarPlus,
+  ClipboardList,
+  History,
+  Loader2,
+  User,
+} from "lucide-react";
+import React from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import React from "react";
-import {
-  ClipboardList,
-  Calendar,
-  History,
-  User,
-  Activity,
-  Loader2,
-  CalendarPlus
-} from "lucide-react";
+import { devError } from "@/lib/logger";
 
 export default function PatientDashboard() {
   const [data, setData] = React.useState<any>(null);
@@ -39,15 +40,35 @@ export default function PatientDashboard() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-textMuted font-medium">Loading your health portal...</p>
+        <p className="text-textMuted font-medium">
+          Loading your health portal...
+        </p>
       </div>
     );
   }
 
   const stats = [
-    { label: "Requests", value: data?.stats.total_requests || "0", icon: ClipboardList, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { label: "Upcoming", value: data?.stats.upcoming_appointments || "0", icon: Calendar, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { label: "Visits", value: data?.stats.past_visits || "0", icon: History, color: "text-purple-500", bg: "bg-purple-500/10" },
+    {
+      label: "Requests",
+      value: data?.stats.total_requests || "0",
+      icon: ClipboardList,
+      color: "text-blue-500",
+      bg: "bg-blue-500/10",
+    },
+    {
+      label: "Upcoming",
+      value: data?.stats.upcoming_appointments || "0",
+      icon: Calendar,
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+    },
+    {
+      label: "Visits",
+      value: data?.stats.past_visits || "0",
+      icon: History,
+      color: "text-purple-500",
+      bg: "bg-purple-500/10",
+    },
   ];
 
   const nextApp = data?.nextAppointment;
@@ -56,8 +77,12 @@ export default function PatientDashboard() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center justify-between bg-surface p-6 rounded-2xl border border-border shadow-sm">
         <div>
-          <h1 className="text-3xl font-bold text-text tracking-tight">Patient Portal</h1>
-          <p className="text-textMuted mt-1">Manage your health records and appointments securely.</p>
+          <h1 className="text-3xl font-bold text-text tracking-tight">
+            Patient Portal
+          </h1>
+          <p className="text-textMuted mt-1">
+            Manage your health records and appointments securely.
+          </p>
         </div>
       </div>
 
@@ -92,14 +117,20 @@ export default function PatientDashboard() {
             <div className="flex items-center gap-6 p-6 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl border border-primary/10">
               <div className="w-20 h-20 bg-primary text-white rounded-2xl flex flex-col items-center justify-center shadow-lg shadow-primary/20">
                 <span className="text-xs font-black uppercase tracking-tighter opacity-80">
-                  {new Date(nextApp.starttime).toLocaleDateString(undefined, { month: 'short' })}
+                  {new Date(nextApp.starttime).toLocaleDateString(undefined, {
+                    month: "short",
+                  })}
                 </span>
                 <span className="text-3xl font-black leading-none">
-                  {new Date(nextApp.starttime).toLocaleDateString(undefined, { day: '2-digit' })}
+                  {new Date(nextApp.starttime).toLocaleDateString(undefined, {
+                    day: "2-digit",
+                  })}
                 </span>
               </div>
               <div className="flex-1">
-                <h4 className="text-xl font-bold text-text mb-1">{nextApp.type || "General Consultation"}</h4>
+                <h4 className="text-xl font-bold text-text mb-1">
+                  {nextApp.type || "General Consultation"}
+                </h4>
                 <div className="flex flex-col gap-1">
                   <p className="text-sm text-textMuted flex items-center gap-2">
                     <User size={14} className="text-primary" />
@@ -107,12 +138,19 @@ export default function PatientDashboard() {
                   </p>
                   <p className="text-sm text-textMuted flex items-center gap-2">
                     <Calendar size={14} className="text-primary" />
-                    {new Date(nextApp.starttime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(nextApp.starttime).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </p>
                 </div>
                 <div className="mt-6 flex gap-3">
-                  <Button size="sm" className="shadow-md">Add to Calendar</Button>
-                  <Button size="sm" variant="outline">Reschedule</Button>
+                  <Button size="sm" className="shadow-md">
+                    Add to Calendar
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    Reschedule
+                  </Button>
                 </div>
               </div>
             </div>
@@ -121,8 +159,13 @@ export default function PatientDashboard() {
               <div className="bg-surface p-4 rounded-full w-fit mx-auto mb-4 shadow-sm border border-border">
                 <CalendarPlus size={32} className="text-primary opacity-60" />
               </div>
-              <h4 className="text-lg font-bold text-text">No visits scheduled</h4>
-              <p className="max-w-xs mx-auto mt-1">You don't have any upcoming appointments. Visit the requests page to book one.</p>
+              <h4 className="text-lg font-bold text-text">
+                No visits scheduled
+              </h4>
+              <p className="max-w-xs mx-auto mt-1">
+                You don't have any upcoming appointments. Visit the requests
+                page to book one.
+              </p>
             </div>
           )}
         </Card>
@@ -148,14 +191,21 @@ export default function PatientDashboard() {
                         {activity.title}
                       </p>
                       <p className="text-xs text-textMuted">
-                        {new Date(activity.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                        {new Date(activity.date).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
                       </p>
                     </div>
                   </div>
                   <Badge
                     variant={
-                      activity.status === "completed" ? "success" :
-                        activity.status === "scheduled" ? "warning" : "info"
+                      activity.status === "completed"
+                        ? "success"
+                        : activity.status === "scheduled"
+                          ? "warning"
+                          : "info"
                     }
                     className="rounded-lg px-3 py-1"
                   >

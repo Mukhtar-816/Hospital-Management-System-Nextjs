@@ -1,22 +1,14 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import type React from "react";
-import { useState, useMemo, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Bell, ChevronRight, Home, Menu, Search, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { showToast } from "nextjs-toast-notify";
-import { Sidebar, type UserRole } from "./Sidebar";
-import { ErrorBoundary } from "../common/ErrorBoundary";
+import type React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Menu,
-  X,
-  Bell,
-  Search,
-  ChevronRight,
-  Home,
-} from "lucide-react";
-import { useRouter } from 'next/navigation';
+import { ErrorBoundary } from "../common/ErrorBoundary";
+import { Sidebar, type UserRole } from "./Sidebar";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -30,7 +22,10 @@ export const DashboardLayout = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const [userData, setUserData] = useState<{ fullname: string; role: string } | null>(null);
+  const [userData, setUserData] = useState<{
+    fullname: string;
+    role: string;
+  } | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -39,22 +34,28 @@ export const DashboardLayout = ({
         if (res.ok) {
           const data = await res.json();
           setUserData(data);
-          
+
           // Clear previous toasts aggressively to prevent stacking
-          if (typeof document !== 'undefined') {
-            document.querySelectorAll('.toast-nextjs, .toast-container, .toast-item').forEach(el => el.remove());
+          if (typeof document !== "undefined") {
+            document
+              .querySelectorAll(".toast-nextjs, .toast-container, .toast-item")
+              .forEach((el) => el.remove());
           }
 
-          showToast.success(`Welcome back, ${data.fullname || 'User'}`);
+          showToast.success(`Welcome back, ${data.fullname || "User"}`);
         } else {
-          if (typeof document !== 'undefined') {
-            document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+          if (typeof document !== "undefined") {
+            document
+              .querySelectorAll(".toast-nextjs, .toast-container")
+              .forEach((el) => el.remove());
           }
           showToast.error("Authentication synchronization failed.");
         }
       } catch (err) {
-        if (typeof document !== 'undefined') {
-          document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+        if (typeof document !== "undefined") {
+          document
+            .querySelectorAll(".toast-nextjs, .toast-container")
+            .forEach((el) => el.remove());
         }
         showToast.error("Connection to identity services lost.");
       }
@@ -76,7 +77,7 @@ export const DashboardLayout = ({
 
   const handleNotificationClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    router.push('/notifications');
+    router.push("/notifications");
   };
 
   return (
@@ -118,8 +119,12 @@ export const DashboardLayout = ({
               <div className="flex-1 overflow-y-auto p-4">
                 {/* Mobile menu content would go here, can reuse sidebar logic */}
                 <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 mb-6">
-                  <p className="text-[10px] text-primary font-black uppercase mb-1">Role</p>
-                  <p className="text-sm font-bold text-text capitalize">{userRole}</p>
+                  <p className="text-[10px] text-primary font-black uppercase mb-1">
+                    Role
+                  </p>
+                  <p className="text-sm font-bold text-text capitalize">
+                    {userRole}
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -145,15 +150,20 @@ export const DashboardLayout = ({
               </div>
               {breadcrumbs.map((crumb, index) => (
                 <div key={crumb.href} className="flex items-center gap-2">
-                  <span className={cn(
-                    "font-bold transition-colors",
-                    crumb.isLast ? "text-primary" : "text-textMuted hover:text-text cursor-pointer"
-                  )}
-                  onClick={() => !crumb.isLast && router.push(crumb.href)}
+                  <span
+                    className={cn(
+                      "font-bold transition-colors",
+                      crumb.isLast
+                        ? "text-primary"
+                        : "text-textMuted hover:text-text cursor-pointer",
+                    )}
+                    onClick={() => !crumb.isLast && router.push(crumb.href)}
                   >
                     {crumb.label}
                   </span>
-                  {!crumb.isLast && <ChevronRight size={14} className="text-textMuted/50" />}
+                  {!crumb.isLast && (
+                    <ChevronRight size={14} className="text-textMuted/50" />
+                  )}
                 </div>
               ))}
             </nav>
@@ -161,7 +171,10 @@ export const DashboardLayout = ({
 
           <div className="flex items-center gap-4">
             <div className="relative hidden lg:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={16} />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted"
+                size={16}
+              />
               <input
                 type="text"
                 placeholder="Search anything..."
@@ -169,11 +182,14 @@ export const DashboardLayout = ({
               />
             </div>
 
-            <button 
-              onClick={handleNotificationClick} 
+            <button
+              onClick={handleNotificationClick}
               className="p-2.5 text-textMuted hover:bg-border/10 rounded-xl relative transition-all group"
             >
-              <Bell size={20} className="group-hover:rotate-12 transition-transform" />
+              <Bell
+                size={20}
+                className="group-hover:rotate-12 transition-transform"
+              />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full border-2 border-surface animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]"></span>
             </button>
 
@@ -187,7 +203,14 @@ export const DashboardLayout = ({
                 </p>
               </div>
               <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-black text-sm shadow-lg shadow-primary/20 ring-2 ring-surface">
-                {userData?.fullname ? userData.fullname.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : "..."}
+                {userData?.fullname
+                  ? userData.fullname
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()
+                      .slice(0, 2)
+                  : "..."}
               </div>
             </div>
           </div>
@@ -201,13 +224,10 @@ export const DashboardLayout = ({
             transition={{ duration: 0.3 }}
             className="p-6 md:p-10 max-w-7xl mx-auto"
           >
-            <ErrorBoundary>
-              {children}
-            </ErrorBoundary>
+            <ErrorBoundary>{children}</ErrorBoundary>
           </motion.div>
         </main>
       </div>
     </div>
   );
 };
-

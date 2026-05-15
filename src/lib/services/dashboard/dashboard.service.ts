@@ -29,13 +29,13 @@ export async function getDoctorDashboardData(userId: string) {
   const [statsRes, nextPatientRes, doctorRes] = await Promise.all([
     pool.query(statsQuery, [userId]),
     pool.query(nextPatientQuery, [userId]),
-    pool.query("SELECT fullname FROM doctor WHERE userid = $1", [userId])
+    pool.query("SELECT fullname FROM doctor WHERE userid = $1", [userId]),
   ]);
 
   return {
     doctor: doctorRes.rows[0],
     stats: statsRes.rows[0],
-    nextPatient: nextPatientRes.rows[0] || null
+    nextPatient: nextPatientRes.rows[0] || null,
   };
 }
 
@@ -104,13 +104,17 @@ export async function getPatientDashboardData(userId: string) {
   const [statsRes, nextAppRes, activityRes] = await Promise.all([
     pool.query(statsQuery, [userId]),
     pool.query(nextAppQuery, [userId]),
-    pool.query(activityQuery, [userId])
+    pool.query(activityQuery, [userId]),
   ]);
 
   return {
-    stats: statsRes.rows[0] || { total_requests: 0, upcoming_appointments: 0, past_visits: 0 },
+    stats: statsRes.rows[0] || {
+      total_requests: 0,
+      upcoming_appointments: 0,
+      past_visits: 0,
+    },
     nextAppointment: nextAppRes.rows[0] || null,
-    activity: activityRes.rows
+    activity: activityRes.rows,
   };
 }
 
@@ -138,11 +142,11 @@ export async function getReceptionistDashboardData() {
 
   const [statsRes, requestsRes] = await Promise.all([
     pool.query(statsQuery),
-    pool.query(recentRequestsQuery)
+    pool.query(recentRequestsQuery),
   ]);
 
   return {
     stats: statsRes.rows[0],
-    recentRequests: requestsRes.rows
+    recentRequests: requestsRes.rows,
   };
 }

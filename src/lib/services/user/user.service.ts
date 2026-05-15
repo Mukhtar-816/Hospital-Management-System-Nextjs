@@ -1,35 +1,50 @@
+import type { PoolClient } from "pg";
 import { pool, withTransaction } from "@/lib/db";
-import { PoolClient } from "pg";
 
-export async function createUser(email: string, password: string, client?: PoolClient) {
+export async function createUser(
+  email: string,
+  password: string,
+  client?: PoolClient,
+) {
   const db = client || pool;
   const result = await db.query(
     `INSERT INTO users (useremail, userpassword) VALUES ($1, $2) RETURNING *`,
-    [email, password]
+    [email, password],
   );
   return result.rows[0];
 }
 
 export async function findByEmail(email: string) {
-  const result = await pool.query(`SELECT * FROM users WHERE useremail = $1`, [email]);
+  const result = await pool.query(`SELECT * FROM users WHERE useremail = $1`, [
+    email,
+  ]);
   return result.rows[0];
 }
 
 export async function findById(userid: string) {
   const result = await pool.query(
     `SELECT userid, useremail, createdat, updatedat FROM users WHERE userid = $1`,
-    [userid]
+    [userid],
   );
   return result.rows[0] ?? null;
 }
 
-export async function assignRole(userid: string, roleName: string, client?: PoolClient) {
+export async function assignRole(
+  userid: string,
+  roleName: string,
+  client?: PoolClient,
+) {
   const db = client || pool;
-  const roleRes = await db.query(`SELECT roleid FROM role WHERE name = $1`, [roleName]);
+  const roleRes = await db.query(`SELECT roleid FROM role WHERE name = $1`, [
+    roleName,
+  ]);
   if (roleRes.rows.length === 0) throw new Error(`Role ${roleName} not found`);
   const roleId = roleRes.rows[0].roleid;
   await db.query(`DELETE FROM userrole WHERE userid = $1`, [userid]);
-  await db.query(`INSERT INTO userrole (userid, roleid) VALUES ($1, $2)`, [userid, roleId]);
+  await db.query(`INSERT INTO userrole (userid, roleid) VALUES ($1, $2)`, [
+    userid,
+    roleId,
+  ]);
 }
 
 export async function createFullUser(data: {
@@ -37,7 +52,11 @@ export async function createFullUser(data: {
   passwordHash: string;
   role: string;
   profileData: any;
-  profileCreator: (client: PoolClient, userid: string, data: any) => Promise<any>;
+  profileCreator: (
+    client: PoolClient,
+    userid: string,
+    data: any,
+  ) => Promise<any>;
 }) {
   return await withTransaction(async (client) => {
     const user = await createUser(data.email, data.passwordHash, client);
@@ -50,13 +69,14 @@ export async function createFullUser(data: {
 export async function getUserRoles(userid: string): Promise<string[]> {
   const result = await pool.query(
     `SELECT r.name FROM role r JOIN userrole ur ON r.roleid = ur.roleid WHERE ur.userid = $1`,
-    [userid]
+    [userid],
   );
   return result.rows.map((row) => row.name);
 }
 
 export async function getMe(userid: string) {
-  const result = await pool.query(`
+  const result = await pool.query(
+    `
     SELECT 
       u.userid, 
       u.useremail, 
@@ -66,8 +86,10 @@ export async function getMe(userid: string) {
     LEFT JOIN receptionist rec ON rec.userid = u.userid
     LEFT JOIN patient p ON p.userid = u.userid
     WHERE u.userid = $1
-  `, [userid]);
-  
+  `,
+    [userid],
+  );
+
   const user = result.rows[0];
   if (!user) return null;
   const userrole = await getUserRoles(userid);
