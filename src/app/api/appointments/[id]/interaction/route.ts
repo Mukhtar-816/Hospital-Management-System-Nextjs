@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { getUserRoleAndPermissions, requirePermission } from "@/lib/auth/permission";
@@ -33,7 +34,7 @@ export async function GET(
 
         return NextResponse.json({ success: true, interaction });
     } catch (err: any) {
-        console.error("GET INTERACTION ERROR:", err);
+        devError("GET INTERACTION ERROR:", err);
         return NextResponse.json(
             { error: err.message || "Failed to fetch interaction" },
             { status: err.message === "Forbidden" ? 403 : 500 }
@@ -68,7 +69,7 @@ export async function POST(
 
         return NextResponse.json({ success: true, ...result });
     } catch (err: any) {
-        console.error("SAVE CLINICAL DATA ERROR:", err);
+        devError("SAVE CLINICAL DATA ERROR:", err);
         return NextResponse.json(
             { error: err.message || "Failed to save interaction" },
             { status: 500 }

@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import {
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
 
     return Response.json({ success: true, userid: user.userid });
   } catch (err: any) {
-    console.error("CREATE RECEPTIONIST ERROR:", err);
+    devError("CREATE RECEPTIONIST ERROR:", err);
     return NextResponse.json({ error: err.message || "Failed" }, { status: 500 });
   }
 }
@@ -61,7 +62,7 @@ export async function PUT(req: Request) {
 
     return Response.json({ success: true });
   } catch (err: any) {
-    console.error("UPDATE RECEPTIONIST ERROR:", err);
+    devError("UPDATE RECEPTIONIST ERROR:", err);
     return NextResponse.json({ error: err.message || "Failed" }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import * as appointmentService from "@/lib/services/appointment/appointment.service";
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
 
         return NextResponse.json({ success: true, appointments });
     } catch (err: any) {
-        console.error("GET DOCTOR APPOINTMENTS ERROR:", err);
+        devError("GET DOCTOR APPOINTMENTS ERROR:", err);
         return NextResponse.json(
             { error: err.message || "Failed to fetch appointments" },
             { status: err.message === "Unauthorized" ? 401 : err.message === "Forbidden" ? 403 : 500 }

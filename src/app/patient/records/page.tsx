@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { devLog, devError } from "@/lib/logger";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -24,7 +25,7 @@ export default function PatientRecords() {
         setRecords(data.records);
       }
     } catch (error) {
-      console.error("Failed to load records:", error);
+      devError("Failed to load records:", error);
     } finally {
       setIsLoading(false);
     }
@@ -95,10 +96,10 @@ export default function PatientRecords() {
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         title="Clinical Record"
-        className="max-w-6xl"
+        className="max-h-[80vh] overflow-y-auto pr-2"
       >
         {selectedAppId && (
-          <div className="max-h-[80vh] overflow-y-auto pr-2">
+          <div className="max-h-[80vh] overflow-y-auto pr-2 ">
             <InteractionDetails appointmentId={selectedAppId} />
           </div>
         )}

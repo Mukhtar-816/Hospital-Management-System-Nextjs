@@ -1,39 +1,47 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f6f8fa;
+  --bg: #f8fafc;
   --surface: #ffffff;
-  --border: #d0d7de;
+  --border: #e2e8f0;
 
-  --text: #24292f;
-  --text-muted: #57606a;
+  --text: #0f172a;
+  --text-muted: #64748b;
 
-  --primary: #0969da;
-  --secondary: #1f6feb;
+  --primary: #2563eb;
+  --secondary: #4f46e5;
 
-  --success: #2da44e;
-  --error: #cf222e;
-  --warning: #bf8700;
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
 
-  --accent: #8250df;
+  --accent: #8b5cf6;
+  --ring: rgba(37, 99, 235, 0.5);
+  
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
 }
 
 .dark {
-  --bg: #0d1117;
-  --surface: #161b22;
-  --border: #30363d;
+  --bg: #020617;
+  --surface: #0f172a;
+  --border: #1e293b;
 
-  --text: #c9d1d9;
-  --text-muted: #8b949e;
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
 
-  --primary: #58a6ff;
-  --secondary: #1f6feb;
+  --primary: #3b82f6;
+  --secondary: #6366f1;
 
-  --success: #3fb950;
-  --error: #f85149;
-  --warning: #d29922;
+  --success: #22c55e;
+  --error: #f43f5e;
+  --warning: #fbbf24;
 
-  --accent: #7c3aed;
+  --accent: #a78bfa;
+  --ring: rgba(59, 130, 246, 0.5);
+
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.05);
 }
 
 @theme {
@@ -52,4 +60,42 @@
   --color-warning: var(--warning);
 
   --color-accent: var(--accent);
+  --color-ring: var(--ring);
 }
+
+@layer utilities {
+  .glass {
+    @apply bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] shadow-xl;
+  }
+  
+  .glass-dark {
+    @apply bg-black/20 backdrop-blur-xl border border-white/5 shadow-2xl;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 20px;
+  }
+}
+
+body {
+  @apply bg-bg text-text antialiased;
+}
+

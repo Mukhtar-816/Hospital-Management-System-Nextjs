@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { pool } from "../db";
 
 export interface UserRoleAndPermissions {
@@ -34,7 +35,7 @@ export async function getUserRoleAndPermissions(
 
     return { role: roleName, permissions };
   } catch (error) {
-    console.error("getUserRoleAndPermissions Error:", error);
+    devError("getUserRoleAndPermissions Error:", error);
     return null;
   }
 }
@@ -45,3 +46,4 @@ export function requirePermission(permission: string, user: any) {
     throw new Error("Forbidden");
   }
 }
+

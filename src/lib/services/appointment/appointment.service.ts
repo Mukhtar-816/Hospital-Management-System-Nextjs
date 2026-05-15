@@ -168,3 +168,11 @@ export async function noShowAppointment(id: string) {
   );
   return result.rows[0];
 }
+
+export async function cancelAppointment(id: string) {
+  const result = await pool.query(
+    `UPDATE appointment SET status = 'cancelled' WHERE appointmentid = $1 RETURNING *`,
+    [id]
+  );
+  return result.rows[0];
+}

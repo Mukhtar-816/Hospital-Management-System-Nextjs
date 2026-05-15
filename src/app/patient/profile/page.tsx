@@ -1,12 +1,19 @@
 "use client";
 
 import { showToast } from "nextjs-toast-notify";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ProfileTemplate } from "@/components/modules/ProfileTemplate";
 import { Input, Select } from "@/components/ui/Forms";
 import { useLoading } from "@/lib/LoadingContext";
 import { Button } from "@/components/ui/Button";
-import { Save, User, MapPin, Hash, VenetianMask } from "lucide-react";
+import { Save, User, MapPin, Hash } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const MapInput = dynamic(() => import("@/components/ui/MapInput").then(mod => mod.MapInput), { 
+  ssr: false,
+  loading: () => <div className="h-10 w-full bg-surface/50 border border-border rounded-xl animate-pulse flex items-center justify-center text-[10px] font-black text-textMuted uppercase">Loading Map Module...</div>
+});
+
 
 export default function PatientProfile() {
   const { showLoading, hideLoading } = useLoading();
@@ -18,6 +25,7 @@ export default function PatientProfile() {
     try {
       const res = await fetch("/api/patient/me");
       if (!res.ok) {
+        if (typeof document !== 'undefined') document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
         showToast.error("Security retrieval failure.");
         return;
       }
@@ -25,6 +33,7 @@ export default function PatientProfile() {
       setUserData(data);
       setFormData(data);
     } catch {
+      if (typeof document !== 'undefined') document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
       showToast.error("Connection synchronization error.");
     } finally {
       hideLoading();
@@ -45,22 +54,36 @@ export default function PatientProfile() {
           address: formData.address,
           gender: formData.gender,
           patientnumber: formData?.patientnumber,
+          location: formData.location,
         }),
       });
 
       if (!res.ok) {
+        if (typeof document !== 'undefined') document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
         showToast.error("Update protocol rejected by server.");
         return;
       }
 
+      if (typeof document !== 'undefined') document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
       showToast.success("Identity profile successfully committed.");
       getUserProfile();
     } catch (err: any) {
+      if (typeof document !== 'undefined') document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
       showToast.error(err.message);
     } finally {
       hideLoading();
     }
   }
+
+  const onLocationChange = useCallback((lat: number, lng: number) => {
+    setFormData((prev: any) => {
+      if (!prev) return prev;
+      if (prev.location && prev.location[0] === lat && prev.location[1] === lng) {
+        return prev;
+      }
+      return { ...prev, location: [lat, lng] };
+    });
+  }, []);
 
   useEffect(() => {
     getUserProfile();
@@ -109,8 +132,8 @@ export default function PatientProfile() {
           <Select
             label="Gender Identity"
             value={formData.gender || ""}
-            onChange={(value: string) =>
-              setFormData({ ...formData, gender: value })
+            onChange={(e) =>
+              setFormData({ ...formData, gender: e.target.value })
             }
             options={[
               { value: "male", label: "Male" },
@@ -118,6 +141,14 @@ export default function PatientProfile() {
               { value: "other", label: "Other" },
             ]}
           />
+        </div>
+
+        <div className="relative">
+           <MapInput 
+             label="Precise Geospatial Location"
+             onLocationChange={onLocationChange}
+             initialLocation={formData.location}
+           />
         </div>
       </div>
 

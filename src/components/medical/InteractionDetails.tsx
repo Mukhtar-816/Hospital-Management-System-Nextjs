@@ -59,7 +59,7 @@ export function InteractionDetails({ appointmentId }: { appointmentId: string })
   if (!data) return null;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+    <div className="grid w-[200px] grid-cols-1 lg:grid-cols-2 w-full h-auto gap-8 items-start inset-0">
       <div className="space-y-6">
         <Card title="Clinical Notes">
           <p className="text-text leading-relaxed whitespace-pre-wrap">

@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { Pool, PoolClient } from "pg";
 
 const globalForPG = globalThis as unknown as {
@@ -24,7 +25,7 @@ if (!globalForPG.pool) {
       client.release();
     })
     .catch((err) => {
-      console.error(" PostgreSQL connection error:", err);
+      devError(" PostgreSQL connection error:", err);
     });
 }
 

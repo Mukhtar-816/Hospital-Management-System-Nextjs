@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { getUserRoleAndPermissions, requirePermission } from "@/lib/auth/permission";
@@ -15,7 +16,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ success: true, doctors });
   } catch (err: any) {
-    console.error("GET DOCTORS ERROR:", err);
+    devError("GET DOCTORS ERROR:", err);
     return NextResponse.json(
       { error: err.message || "Failed to fetch doctors" },
       { status: err.message === "Unauthorized" ? 401 : 500 }
@@ -45,7 +46,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, userid: user.userid });
   } catch (err: any) {
-    console.error("POST DOCTOR ERROR:", err);
+    devError("POST DOCTOR ERROR:", err);
     return NextResponse.json({ error: err.message || "Failed to create doctor" }, { status: 400 });
   }
 }
@@ -62,7 +63,7 @@ export async function PUT(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error("PUT DOCTOR ERROR:", err);
+    devError("PUT DOCTOR ERROR:", err);
     return NextResponse.json({ error: err.message || "Failed to update doctor" }, { status: 400 });
   }
 }

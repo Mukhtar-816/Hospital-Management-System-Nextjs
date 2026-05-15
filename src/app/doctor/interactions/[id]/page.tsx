@@ -1,4 +1,4 @@
-"use client";
+"use client"; import { devLog, devError } from "@/lib/logger";
 
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -48,7 +48,7 @@ export default function InteractionPage({
           setAppointment(json.appointment);
         }
       } catch (err) {
-        console.error("Failed to fetch appointment:", err);
+        devError("Failed to fetch appointment:", err);
       }
     }
     fetchAppointment();
@@ -78,11 +78,11 @@ export default function InteractionPage({
       const finalDiagnoses = diagnoses.map(d => d.value).filter(v => v.trim() !== "");
       const finalPrescriptions = prescriptions
         .filter(p => p.medicine.trim() !== "")
-        .map(p => ({ 
-          medicine: p.medicine, 
-          frequency: p.frequency, 
-          duration: p.duration, 
-          instructions: p.instructions 
+        .map(p => ({
+          medicine: p.medicine,
+          frequency: p.frequency,
+          duration: p.duration,
+          instructions: p.instructions
         }));
 
       const res = await fetch(`/api/appointments/${params.id}/interaction`, {
@@ -99,7 +99,7 @@ export default function InteractionPage({
 
       router.push("/doctor/appointments");
     } catch (error) {
-      console.error("Submission failed:", error);
+      devError("Submission failed:", error);
       alert("Failed to save interaction. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -176,9 +176,9 @@ export default function InteractionPage({
             >
               <div className="space-y-4">
                 {diagnoses.map((diag) => (
-                  <Input 
-                    key={diag.id} 
-                    placeholder="Enter diagnosis..." 
+                  <Input
+                    key={diag.id}
+                    placeholder="Enter diagnosis..."
                     value={diag.value}
                     onChange={(e: any) => updateDiagnosis(diag.id, e.target.value)}
                   />
@@ -207,9 +207,9 @@ export default function InteractionPage({
                     key={presc.id}
                     className="p-4 rounded-xl bg-border/5 border border-border space-y-3"
                   >
-                    <Input 
-                      label="Medicine Name" 
-                      placeholder="e.g. Paracetamol" 
+                    <Input
+                      label="Medicine Name"
+                      placeholder="e.g. Paracetamol"
                       value={presc.medicine}
                       onChange={(e: any) => updatePrescription(presc.id, 'medicine', e.target.value)}
                     />

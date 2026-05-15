@@ -56,7 +56,19 @@ export async function getUserRoles(userid: string): Promise<string[]> {
 }
 
 export async function getMe(userid: string) {
-  const user = await findById(userid);
+  const result = await pool.query(`
+    SELECT 
+      u.userid, 
+      u.useremail, 
+      COALESCE(d.fullname, rec.fullname, p.fullname, u.useremail) AS fullname
+    FROM users u
+    LEFT JOIN doctor d ON d.userid = u.userid
+    LEFT JOIN receptionist rec ON rec.userid = u.userid
+    LEFT JOIN patient p ON p.userid = u.userid
+    WHERE u.userid = $1
+  `, [userid]);
+  
+  const user = result.rows[0];
   if (!user) return null;
   const userrole = await getUserRoles(userid);
   const role = userrole[0] ?? "";

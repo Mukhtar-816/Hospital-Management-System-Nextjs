@@ -1,4 +1,4 @@
-"use client";
+"use client"; import { devLog, devError } from "@/lib/logger";
 
 import React from "react";
 import { Badge } from "@/components/ui/Badge";
@@ -48,7 +48,7 @@ export default function Receptionist() {
       if (!res.ok) throw new Error("Failed to update status");
       loadAppointments();
     } catch (error) {
-      console.error(`Failed to ${action} appointment:`, error);
+      devError(`Failed to ${action} appointment:`, error);
     } finally {
       hideLoading();
     }
@@ -60,7 +60,7 @@ export default function Receptionist() {
       const data = await res.json();
       setAppointments(data.appointments || []);
     } catch (error) {
-      console.error("Failed to load appointments:", error);
+      devError("Failed to load appointments:", error);
     }
   };
 

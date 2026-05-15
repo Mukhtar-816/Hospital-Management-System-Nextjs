@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { getUserRoleAndPermissions } from "@/lib/auth/permission";
@@ -19,7 +20,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ success: true, requests });
   } catch (err: any) {
-    console.error("GET PATIENT REQUESTS ERROR:", err);
+    devError("GET PATIENT REQUESTS ERROR:", err);
     return NextResponse.json(
       { error: err.message || "Failed to fetch requests" },
       { status: err.message === "Unauthorized" ? 401 : 500 }

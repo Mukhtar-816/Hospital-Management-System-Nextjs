@@ -7,6 +7,7 @@ interface ModalProps {
   title: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  maxWidth?: string;
 }
 
 export const Modal = ({
@@ -15,11 +16,12 @@ export const Modal = ({
   title,
   children,
   footer,
+  maxWidth,
 }: ModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed  inset-0 z-50 flex items-center justify-center p-4 w-full">
       <button
         type="button"
         className="absolute inset-0 bg-black/60 backdrop-blur-sm w-full h-full border-none cursor-default"
@@ -27,7 +29,7 @@ export const Modal = ({
         onKeyUp={(e) => e.key === "Escape" && onClose()}
         aria-label="Close modal"
       />
-      <div className="relative bg-surface border border-border rounded-2xl w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200">
+      <div className={`relative ${maxWidth ? `${maxWidth}` : "max-w-7xl"} bg-surface border border-border rounded-2xl w-full  shadow-2xl animate-in zoom-in-95 duration-200`}>
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-xl font-semibold text-text">{title}</h2>
           <button
@@ -54,7 +56,7 @@ export const Modal = ({
             </svg>
           </button>
         </div>
-        <div className="p-6">{children}</div>
+        <div className={`p-6 w-full max-h-[80vh] top-30 `}>{children}</div>
         <div className="p-6 border-t border-border flex justify-end gap-3">
           {footer || (
             <Button variant="secondary" onClick={onClose}>

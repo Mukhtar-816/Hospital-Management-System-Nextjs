@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { getUserRoleAndPermissions, requirePermission } from "@/lib/auth/permission";
@@ -18,7 +19,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, appointment });
   } catch (err: any) {
-    console.error("CHECKIN APPOINTMENT ERROR:", err);
+    devError("CHECKIN APPOINTMENT ERROR:", err);
     return NextResponse.json(
       { error: err.message || "Failed to check-in appointment" },
       { status: err.message.includes("Invalid transition") ? 400 : 500 }

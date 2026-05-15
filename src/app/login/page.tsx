@@ -48,7 +48,10 @@ export default function LoginPage() {
       const meData = await meRes.json();
 
       const role: string = meData.role;
-      showToast.success(role);
+      if (typeof document !== 'undefined') {
+        document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+      }
+      showToast.success("Successfully Logged In");
 
       if (role === "admin") {
         router.push("/admin/dashboard");
@@ -60,6 +63,9 @@ export default function LoginPage() {
         router.push("/patient/dashboard");
       }
     } catch (err: any) {
+      if (typeof document !== 'undefined') {
+        document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+      }
       showToast.error(err.message || "Something went wrong");
       setError(err.message || "Something went wrong. Please try again.");
     } finally {

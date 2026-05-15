@@ -14,6 +14,7 @@ export async function GET(req: Request) {
     return Response.json({
       userid: me.userid,
       useremail: me.useremail,
+      fullname: me.fullname,
       role: me.role,
     });
   } catch (err: any) {

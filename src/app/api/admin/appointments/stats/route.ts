@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { getUserRoleAndPermissions, requirePermission } from "@/lib/auth/permission";
@@ -13,7 +14,7 @@ export async function GET(req: Request) {
     const analytics = await getAdminAppointmentAnalytics();
     return NextResponse.json({ success: true, ...analytics });
   } catch (err: any) {
-    console.error("ADMIN APPOINTMENT STATS ERROR:", err);
+    devError("ADMIN APPOINTMENT STATS ERROR:", err);
     const isForbidden = err.message === "Forbidden" || err.message?.includes("denied");
     return NextResponse.json(
       { error: err.message || "Failed to fetch analytics" }, 

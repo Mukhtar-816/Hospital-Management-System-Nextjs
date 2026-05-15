@@ -4,12 +4,12 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import React from "react";
-import { 
-  ClipboardList, 
-  Calendar, 
-  History, 
-  User, 
-  Activity, 
+import {
+  ClipboardList,
+  Calendar,
+  History,
+  User,
+  Activity,
   Loader2,
   CalendarPlus
 } from "lucide-react";
@@ -27,7 +27,7 @@ export default function PatientDashboard() {
           setData(json);
         }
       } catch (err) {
-        console.error("Dashboard Load Error:", err);
+        devError("Dashboard Load Error:", err);
       } finally {
         setIsLoading(false);
       }
@@ -71,20 +71,20 @@ export default function PatientDashboard() {
               <stat.icon className={stat.color} size={24} />
             </div>
             <div className="pt-2">
-               <h3 className="text-4xl font-black text-text mb-1 group-hover:scale-105 transition-transform origin-left">
-                 {stat.value}
-               </h3>
-               <p className="text-xs font-bold text-textMuted uppercase tracking-widest">
-                 {stat.label}
-               </p>
+              <h3 className="text-4xl font-black text-text mb-1 group-hover:scale-105 transition-transform origin-left">
+                {stat.value}
+              </h3>
+              <p className="text-xs font-bold text-textMuted uppercase tracking-widest">
+                {stat.label}
+              </p>
             </div>
           </Card>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card 
-          title="Next Visit" 
+        <Card
+          title="Next Visit"
           subtitle="Your immediate upcoming appointment details"
           className="bg-surface/50 backdrop-blur-sm border-none shadow-xl"
         >
@@ -101,14 +101,14 @@ export default function PatientDashboard() {
               <div className="flex-1">
                 <h4 className="text-xl font-bold text-text mb-1">{nextApp.type || "General Consultation"}</h4>
                 <div className="flex flex-col gap-1">
-                   <p className="text-sm text-textMuted flex items-center gap-2">
-                     <User size={14} className="text-primary" />
-                     Dr. {nextApp.doctorname}
-                   </p>
-                   <p className="text-sm text-textMuted flex items-center gap-2">
-                     <Calendar size={14} className="text-primary" />
-                     {new Date(nextApp.starttime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                   </p>
+                  <p className="text-sm text-textMuted flex items-center gap-2">
+                    <User size={14} className="text-primary" />
+                    Dr. {nextApp.doctorname}
+                  </p>
+                  <p className="text-sm text-textMuted flex items-center gap-2">
+                    <Calendar size={14} className="text-primary" />
+                    {new Date(nextApp.starttime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
                 </div>
                 <div className="mt-6 flex gap-3">
                   <Button size="sm" className="shadow-md">Add to Calendar</Button>
@@ -127,8 +127,8 @@ export default function PatientDashboard() {
           )}
         </Card>
 
-        <Card 
-          title="Recent Activity" 
+        <Card
+          title="Recent Activity"
           subtitle="Updates on your latest interactions and visits"
           className="bg-surface/50 backdrop-blur-sm border-none shadow-xl"
         >

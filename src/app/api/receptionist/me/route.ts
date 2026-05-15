@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { getPatientByUserId, updatePatient } from "@/lib/services/patient/patient.service";
 import { getUser } from "src/lib/auth/getUser";
@@ -19,7 +20,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ ...receptionist, ...user, role: "receptionist" });
 
     } catch (error: any) {
-        console.log(error);
+        devLog(error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
@@ -31,7 +32,7 @@ export async function PUT(req: NextRequest) {
         if (!decoded) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
         const access = await getUserRoleAndPermissions(decoded.userid);
-        requirePermission("receptionist.update", access);
+        requirePermission("profile.update", access);
 
         const user = await findById(decoded.userid);
         const receptionist = await getReceptionistByUserId(decoded.userid);
@@ -44,7 +45,7 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ ...updatedReceptionist, ...user });
 
     } catch (error: any) {
-        console.log(error);
+        devLog(error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

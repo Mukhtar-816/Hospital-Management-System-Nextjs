@@ -1,9 +1,16 @@
-"use client";
+"use client"; import { devLog, devError } from "@/lib/logger";
 
 import { useRouter } from "next/navigation";
 import React from "react";
+import { LogOut, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export const LogoutButton = ({ className }: { className?: string }) => {
+interface LogoutButtonProps {
+  className?: string;
+  showLabel?: boolean;
+}
+
+export const LogoutButton = ({ className, showLabel = true }: LogoutButtonProps) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -19,7 +26,7 @@ export const LogoutButton = ({ className }: { className?: string }) => {
         router.refresh();
       }
     } catch (error) {
-      console.error("Logout failed:", error);
+      devError("Logout failed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -29,24 +36,24 @@ export const LogoutButton = ({ className }: { className?: string }) => {
     <button
       onClick={handleLogout}
       disabled={isLoading}
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-textMuted hover:bg-red-50 hover:text-red-600 w-full font-medium ${className}`}
+      className={cn(
+        "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-textMuted hover:bg-error/10 hover:text-error w-full font-semibold",
+        !showLabel && "justify-center px-0",
+        className
+      )}
+      title="Logout"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-        <polyline points="16 17 21 12 16 7" />
-        <line x1="21" y1="12" x2="9" y2="12" />
-      </svg>
-      {isLoading ? "Logging out..." : "Logout"}
+      {isLoading ? (
+        <Loader2 size={20} className="animate-spin shrink-0" />
+      ) : (
+        <LogOut size={20} className="shrink-0" />
+      )}
+      {showLabel && (
+        <span className="whitespace-nowrap">
+          {isLoading ? "Logging out..." : "Logout"}
+        </span>
+      )}
     </button>
   );
 };
+

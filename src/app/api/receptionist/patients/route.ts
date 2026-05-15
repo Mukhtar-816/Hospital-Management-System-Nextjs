@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { getUser } from "src/lib/auth/getUser";
 import { getUserRoleAndPermissions, requirePermission } from "src/lib/auth/permission";
@@ -14,7 +15,7 @@ export async function GET(req: NextRequest) {
         const patients = await getAllPatients();
         return NextResponse.json(patients);
     } catch (error: any) {
-        console.log(error);
+        devLog(error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

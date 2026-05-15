@@ -1,4 +1,4 @@
-"use client";
+"use client"; import { devLog, devError } from "@/lib/logger";
 
 import React from "react";
 import { Badge } from "@/components/ui/Badge";
@@ -22,7 +22,7 @@ export default function ReceptionistRequests() {
         setRequests(data.requests);
       }
     } catch (error) {
-      console.error("Failed to fetch requests:", error);
+      devError("Failed to fetch requests:", error);
     }
   };
 
@@ -47,7 +47,7 @@ export default function ReceptionistRequests() {
 
   const handleReject = async (id: string) => {
     if (!confirm("Are you sure you want to reject this request?")) return;
-    
+
     showLoading();
     try {
       const res = await fetch(`/api/appointmentrequests/${id}/reject`, {
@@ -94,7 +94,7 @@ export default function ReceptionistRequests() {
                 <Badge
                   variant={
                     req.priority === "high" ? "error" :
-                    req.priority === "medium" ? "warning" : "info"
+                      req.priority === "medium" ? "warning" : "info"
                   }
                 >
                   {req.priority}
@@ -108,7 +108,7 @@ export default function ReceptionistRequests() {
                 <Badge
                   variant={
                     req.status === "pending" ? "warning" :
-                    req.status === "approved" ? "success" : "error"
+                      req.status === "approved" ? "success" : "error"
                   }
                 >
                   {req.status}

@@ -1,4 +1,4 @@
-"use client";
+"use client"; import { devLog, devError } from "@/lib/logger";
 
 import React from "react";
 import Link from "next/link";
@@ -35,7 +35,7 @@ export default function DoctorAppointments() {
         setAppointments(data.appointments);
       }
     } catch (error) {
-      console.error("Failed to load appointments:", error);
+      devError("Failed to load appointments:", error);
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +68,7 @@ export default function DoctorAppointments() {
         loadAppointments();
       }
     } catch (error) {
-      console.error(`Failed to ${action} appointment:`, error);
+      devError(`Failed to ${action} appointment:`, error);
     } finally {
       hideLoading();
     }
@@ -135,8 +135,8 @@ export default function DoctorAppointments() {
                     </Button>
                   )}
                   {app.status === "completed" && (
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       variant="ghost"
                       onClick={() => handleViewRecord(app.appointmentId)}
                     >

@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { getUser } from "@/lib/auth/getUser";
 import {
   getUserRoleAndPermissions,
@@ -19,7 +20,7 @@ export async function GET(req: Request) {
 
     return Response.json(users);
   } catch (err: any) {
-    console.log(err)
+    devLog(err)
     if (err?.message === "Unauthorized") {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
 
     return Response.json({ success: true, user });
   } catch (err: any) {
-    console.error("ADMIN CREATE USER ERROR:", err);
+    devError("ADMIN CREATE USER ERROR:", err);
     return Response.json(
       { error: err?.message || "Something went wrong" },
       { status: 400 },

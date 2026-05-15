@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { getUserRoleAndPermissions, requirePermission } from "@/lib/auth/permission";
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, request });
   } catch (err: any) {
-    console.error("CREATE REQUEST ERROR:", err);
+    devError("CREATE REQUEST ERROR:", err);
     return NextResponse.json(
       { error: err.message || "Failed to create request" },
       { status: err.message === "Unauthorized" ? 401 : err.message === "Forbidden" ? 403 : 500 }
@@ -51,7 +52,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ success: true, requests });
   } catch (err: any) {
-    console.error("GET REQUESTS ERROR:", err);
+    devError("GET REQUESTS ERROR:", err);
     return NextResponse.json(
       { error: err.message || "Failed to fetch requests" },
       { status: 500 }

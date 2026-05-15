@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { getUser } from "@/lib/auth/getUser";
 import {
   getUserRoleAndPermissions,
@@ -70,7 +71,7 @@ export async function PUT(
 
     return Response.json({ success: true });
   } catch (err: any) {
-    console.error("ADMIN ASSIGN ROLE ERROR:", err);
+    devError("ADMIN ASSIGN ROLE ERROR:", err);
     return Response.json(
       { error: err?.message || "Something went wrong" },
       { status: 400 },

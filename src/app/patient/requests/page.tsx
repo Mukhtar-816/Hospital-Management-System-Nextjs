@@ -1,5 +1,6 @@
 "use client";
 
+import { devLog, devError } from "@/lib/logger";
 import Link from "next/link";
 import React from "react";
 import { Badge } from "@/components/ui/Badge";
@@ -21,7 +22,7 @@ export default function PatientRequests() {
         setRequests(data.requests);
       }
     } catch (error) {
-      console.error("Failed to fetch requests:", error);
+      devError("Failed to fetch requests:", error);
     } finally {
       hideLoading();
     }
@@ -55,7 +56,7 @@ export default function PatientRequests() {
                 <Badge
                   variant={
                     req.priority === "high" ? "error" :
-                    req.priority === "medium" ? "warning" : "info"
+                      req.priority === "medium" ? "warning" : "info"
                   }
                 >
                   {req.priority}
@@ -67,7 +68,7 @@ export default function PatientRequests() {
                 <Badge
                   variant={
                     req.status === "pending" ? "warning" :
-                    req.status === "approved" ? "success" : "error"
+                      req.status === "approved" ? "success" : "error"
                   }
                 >
                   {req.status}

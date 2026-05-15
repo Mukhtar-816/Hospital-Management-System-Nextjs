@@ -1,4 +1,4 @@
-"use client";
+"use client"; import { devLog, devError } from "@/lib/logger";
 
 import React, { Activity } from "react";
 import { Button } from "@/components/ui/Button";
@@ -10,13 +10,13 @@ import { validateInput } from "@/lib/utils/inputValidator";
 import { handleApiError } from "@/lib/utils/errorHandler";
 import { useNetworkStatus } from "@/lib/hooks/useNetworkStatus";
 import { showToast } from "nextjs-toast-notify";
-import { 
-  User, 
-  Stethoscope, 
-  Calendar, 
-  Clock, 
-  CheckCircle2, 
-  ChevronRight, 
+import {
+  User,
+  Stethoscope,
+  Calendar,
+  Clock,
+  CheckCircle2,
+  ChevronRight,
   ChevronLeft,
   Search,
   Loader2,
@@ -108,7 +108,7 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
       const data = await res.json();
       setPatientResults(data.patients || []);
     } catch (error) {
-      console.error("Patient search failed:", error);
+      devError("Patient search failed:", error);
     }
   };
 
@@ -242,7 +242,7 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
       <div className="space-y-8 animate-in slide-in-from-bottom-2 duration-300">
         <div className="flex items-center justify-between px-6 relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-0.5 bg-border -z-10" />
-          
+
           <div className="flex flex-col items-center gap-2 bg-surface px-2">
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${currentStep >= 1 ? "bg-primary text-white shadow-lg shadow-primary/20 scale-110" : "bg-border text-textMuted"}`}>
               <User size={20} />
@@ -270,7 +270,7 @@ export function AppointmentModal({ isOpen, onClose, onSuccess, initialData }: Ap
                 className="pl-10"
               />
               <Search className="absolute left-3 top-[38px] text-textMuted group-focus-within:text-primary transition-colors" size={18} />
-              
+
               {patientResults.length > 0 && (
                 <div className="absolute z-20 w-full mt-2 bg-surface border border-border rounded-2xl shadow-2xl max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
                   {patientResults.map((p) => (

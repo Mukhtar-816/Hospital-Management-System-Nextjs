@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { getUserRoleAndPermissions } from "@/lib/auth/permission";
@@ -15,7 +16,7 @@ export async function GET(req: Request) {
     const data = await getPatientDashboardData(decoded.userid);
     return NextResponse.json({ success: true, ...data });
   } catch (err: any) {
-    console.log(err);
+    devLog(err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

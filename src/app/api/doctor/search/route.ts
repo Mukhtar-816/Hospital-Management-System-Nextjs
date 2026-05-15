@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { requirePermission } from "@/lib/auth/permission";
@@ -27,7 +28,7 @@ export async function GET(req: Request) {
 
         return NextResponse.json({ doctors });
     } catch (err: any) {
-        console.error("SEARCH_DOCTORS_ERROR:", err);
+        devError("SEARCH_DOCTORS_ERROR:", err);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

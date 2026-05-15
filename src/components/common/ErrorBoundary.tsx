@@ -1,4 +1,4 @@
-"use client";
+"use client"; import { devLog, devError } from "@/lib/logger";
 
 import React from "react";
 import { Button } from "../ui/Button";
@@ -28,14 +28,14 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: any, errorInfo: any) {
     if (process.env.NODE_ENV === "development") {
-      console.error("ErrorBoundary caught an error:", error, errorInfo);
+      devError("ErrorBoundary caught an error:", error, errorInfo);
     }
   }
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
-      
+
       return (
         <div className="p-12 text-center flex flex-col items-center justify-center space-y-4 bg-error/5 rounded-3xl border border-error/20 m-6">
           <div className="text-4xl">⚠️</div>

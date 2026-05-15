@@ -1,8 +1,9 @@
+import { devLog, devError } from "@/lib/logger";
 const IS_DEV = process.env.NODE_ENV === "development";
 
 export function handleApiError(error: any) {
   if (IS_DEV) {
-    console.error("DEBUG API ERROR:", error);
+    devError("DEBUG API ERROR:", error);
   }
 
   const message = String(error?.message || "").toLowerCase();

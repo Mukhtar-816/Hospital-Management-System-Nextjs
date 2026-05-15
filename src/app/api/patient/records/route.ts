@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { getUserRoleAndPermissions } from "@/lib/auth/permission";
@@ -19,7 +20,7 @@ export async function GET(req: Request) {
     const records = await getInteractionsByPatientId(patient.patientid);
     return NextResponse.json({ success: true, records });
   } catch (err: any) {
-    console.error("GET PATIENT RECORDS ERROR:", err);
+    devError("GET PATIENT RECORDS ERROR:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

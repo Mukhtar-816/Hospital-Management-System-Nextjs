@@ -1,4 +1,4 @@
-"use client";
+"use client"; import { devLog, devError } from "@/lib/logger";
 
 import type React from "react";
 import { useEffect, useState } from "react";
@@ -30,13 +30,27 @@ export default function DoctorProfile() {
     const loadProfile = async () => {
       showLoading();
       try {
-        const res = await fetch("/api/doctor/me");
-        if (!res.ok) throw new Error("Synchronization failure.");
-        const data = await res.json();
-        console.log(data);
+        const [userRes, doctorRes] = await Promise.all([
+          fetch("/api/users/me"),
+          fetch("/api/doctor/me")
+        ]);
 
+        if (!userRes.ok || !doctorRes.ok) throw new Error("Synchronization failure.");
 
-        setForm(data.doctor);
+        const userData = await userRes.json();
+        const doctorData = await doctorRes.json();
+
+        setUser({
+          userid: userData.userid,
+          useremail: userData.useremail,
+          role: userData.role,
+        });
+
+        setForm({
+          fullname: doctorData.doctor.fullname || "",
+          specialization: doctorData.doctor.specialization || "",
+          status: doctorData.doctor.status || "active",
+        });
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -64,7 +78,6 @@ export default function DoctorProfile() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userid: user.userid,
-          useremail: user.useremail,
           fullname: form.fullname,
           specialization: form.specialization,
         }),
@@ -72,9 +85,16 @@ export default function DoctorProfile() {
 
       if (!res.ok) throw new Error("Commit protocol rejected.");
       setSuccess("Profile information updated.");
+
+      if (typeof document !== 'undefined') {
+        document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+      }
       showToast.success("Profile records updated.");
     } catch (err: any) {
       setError(err.message);
+      if (typeof document !== 'undefined') {
+        document.querySelectorAll('.toast-nextjs, .toast-container').forEach(el => el.remove());
+      }
       showToast.error(err.message);
     } finally {
       hideLoading();

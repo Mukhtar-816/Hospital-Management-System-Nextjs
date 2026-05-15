@@ -1,3 +1,4 @@
+import { devLog, devError } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { getUserRoleAndPermissions } from "@/lib/auth/permission";
@@ -19,7 +20,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, request });
   } catch (err: any) {
-    console.error("REJECT REQUEST ERROR:", err);
+    devError("REJECT REQUEST ERROR:", err);
     return NextResponse.json(
       { error: err.message || "Failed to reject request" },
       { status: err.message === "Unauthorized" ? 401 : 500 }

@@ -1,7 +1,6 @@
-import { authorize } from "@/lib/auth/authorize";
+import { getUserRoleAndPermissions, requirePermission } from "@/lib/auth/permission";
 import { getUser } from "@/lib/auth/getUser";
 import { pool } from "@/lib/db";
-import * as userService from "@/lib/services/user/user.service";
 
 export async function GET(
   req: Request,
@@ -9,10 +8,8 @@ export async function GET(
 ) {
   try {
     const decoded = getUser(req) as { userid: string };
-    await authorize(decoded.userid, "READ_PATIENT");
-
-    const me = await userService.getMe(decoded.userid);
-    const role = me?.role ?? "";
+    const access = await getUserRoleAndPermissions(decoded.userid);
+    if (!access) throw new Error("Forbidden");
 
     const { id } = await params;
 
@@ -27,15 +24,21 @@ export async function GET(
 
     const patient = result.rows[0];
 
-    if (role === "doctor") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+    // 1. If has 'patient.read_all', allow access
+    const canReadAll = access.permissions.includes("patient.read_all");
+    if (canReadAll) {
+      return Response.json({ patient });
     }
 
-    if (role === "patient" && patient.userid !== decoded.userid) {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+    // 2. Otherwise check 'patient.read' + Ownership
+    requirePermission("patient.read", access);
+
+    if (patient.userid !== decoded.userid) {
+        return Response.json({ error: "Forbidden: You can only view your own profile" }, { status: 403 });
     }
 
     return Response.json({ patient });
+
   } catch (err: any) {
     if (err?.message === "Unauthorized") {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
