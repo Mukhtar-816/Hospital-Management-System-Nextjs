@@ -4,6 +4,17 @@ MedCloud is an enterprise-grade, high-fidelity Hospital Management System (HMS) 
 
 ---
 
+## 📺 Project Resources
+
+* **Live Production Demo:** [https://hospital-managment-system-rosy.vercel.app/](https://hospital-managment-system-rosy.vercel.app/)
+* **Repository Link:** [https://github.com/Mukhtar-816/Hospital-Management-System-Nextjs](https://github.com/Mukhtar-816/Hospital-Management-System-Nextjs)
+
+*(Note: If you have uploaded a walk-through video, you can embed your `<video>` tag right here to showcase your UI/UX features immediately.)*
+<video>
+https://github.com/user-attachments/assets/86d105ab-91e1-4147-9d03-f8075714209d
+</video>
+---
+
 ## Architectural Overview
 
 MedCloud balances strict relational data constraints with a high-interactivity frontend. The engineering core focuses heavily on system integrity, utilizing role-scoped access control, data lifespan mitigation, and atomic transaction layers.
@@ -59,7 +70,7 @@ The guided scheduling dashboard handles real-time verification vectors without o
 
 ## Technology Stack
 
-* **Core Framework:** Next.js (App Router, Server Actions)
+* **Core Framework:** Next.js 15 (App Router, Server Actions)
 * **Language Engine:** TypeScript
 * **Database Engine:** PostgreSQL (Native PG Connection Pool)
 * **State & Animation Engine:** Framer Motion (Staggered sequential analytics dashboard entries)
@@ -78,8 +89,8 @@ The guided scheduling dashboard handles real-time verification vectors without o
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/yourusername/medcloud.git](https://github.com/yourusername/medcloud.git)
-   cd medcloud
+   git clone [https://github.com/Mukhtar-816/Hospital-Management-System-Nextjs.git](https://github.com/Mukhtar-816/Hospital-Management-System-Nextjs.git)
+   cd Hospital-Management-System-Nextjs
 Install dependencies via your preferred package manager:
 
 Bash
@@ -87,7 +98,7 @@ npm install
 # or
 pnpm install
 Configure Environment Variables:
-Create a .env.local file in the root subdirectory directory and supply your system configurations:
+Create a .env.local file in the root subdirectory and supply your system configurations:
 
 Code snippet
 DATABASE_URL=postgresql://username:password@localhost:5432/medcloud
@@ -105,6 +116,4 @@ Bash
 npm run dev
 # or
 pnpm dev
-live:https://hospital-managment-system-rosy.vercel.app/
-Academic Affiliation
-Developed as part of advanced system engineering exploration under the curriculum framework at FAST NUCES. The project focuses on translating core computational concepts—relational integrity, isolation states, and robust system topology—into highly-engineered corporate solutions.
+Open http://localhost:3000 inside your web browser to examine the application environment.
