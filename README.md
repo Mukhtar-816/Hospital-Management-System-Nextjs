@@ -9,10 +9,12 @@ MedCloud is an enterprise-grade, high-fidelity Hospital Management System (HMS) 
 * **Live Production Demo:** [https://hospital-managment-system-rosy.vercel.app/](https://hospital-managment-system-rosy.vercel.app/)
 * **Repository Link:** [https://github.com/Mukhtar-816/Hospital-Management-System-Nextjs](https://github.com/Mukhtar-816/Hospital-Management-System-Nextjs)
 
-*(Note: If you have uploaded a walk-through video, you can embed your `<video>` tag right here to showcase your UI/UX features immediately.)*
-<video>
-https://github.com/user-attachments/assets/86d105ab-91e1-4147-9d03-f8075714209d
-</video>
+---
+
+## 📺 Project Demo
+
+<video src="https://github.com/user-attachments/assets/86d105ab-91e1-4147-9d03-f8075714209d" controls autoplay loop muted width="100%"></video>
+
 ---
 
 ## Architectural Overview
